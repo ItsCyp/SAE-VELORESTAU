@@ -1,9 +1,129 @@
-html, body {
+/* ----------------------
+   Reset & Base
+   ---------------------- */
+   html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* ----------------------
+     Barre de navigation
+     ---------------------- */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 0 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .navbar .logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+  }
+  .navbar .logo i {
+    margin-right: 1rem;
+  }
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+  .nav-links a:hover {
+    color: #007bff;
+  }
+  
+  /* ----------------------
+     Structure principale
+     ---------------------- */
+  .main-container {
+    display: flex;
+    height: calc(100vh - 56px); /* 56px = hauteur nav */
+  }
+  
+  /* ----------------------
+     Sidebar
+     ---------------------- */
+  .sidebar {
+    width: 15%;         /* ou 30% selon préférence */
+    background: #f1f1f1;
+    padding: 1rem;
+    overflow-y: auto;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+  }
+  
+  /* ----------------------
+     Contrôles checkbox
+     ---------------------- */
+  .filters label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+  }
+  .filters label, .filters label * { /* pour ne pas sélectionner le texte */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
-#map {
-    width: 100%;
-    height: 100vh;
+/* ----------------------
+     Bouton centrer la carte
+     ---------------------- */
+.center-map {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
 }
+.center-map button {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.center-map button:hover {
+    background: #0056b3;
+}
+
+  
+  /* ----------------------
+     Carte
+     ---------------------- */
+  .map-container {
+    flex: 1;
+    position: relative;
+  }
+  #map {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* ----------------------
+     Widget météo
+     ---------------------- */
+  .weather-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .weather-card i {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+  }
+  

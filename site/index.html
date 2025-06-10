@@ -7,13 +7,54 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""/>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.234.0/dist/lucide.min.js"></script>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <div id="map"></div>
+<!-- Barre de navigation -->
+<nav class="navbar">
+    <h1 class="logo"><i data-lucide="map-pin"></i> VELORESTAU Nancy</h1>
+    <ul class="nav-links">
+      <li><a href="#"><i data-lucide="home"></i> Accueil</a></li>
+      <li><a href="#"><i data-lucide="info"></i> À propos</a></li>
+    </ul>
+</nav>
+
+  <div class="main-container">
+    <!-- Sidebar filtres et listes -->
+    <aside class="sidebar">
+      <!-- Filtres -->
+      <section class="filters">
+        <h2><i data-lucide="funnel"></i> Filtres</h2>
+        <label><input type="checkbox" id="chk-velibs" checked> <i data-lucide="bike"></i> Vélos</label>
+        <label><input type="checkbox" id="chk-restaurants" checked> <i data-lucide="coffee"></i> Restaurants</label>
+        <label><input type="checkbox" id="chk-incidents" checked> <i data-lucide="alert-triangle"></i> Incidents</label>
+      </section>
+
+      <!-- Météo -->
+      <section class="weather">
+        <h2><i data-lucide="cloud-sun"></i> Météo actuelle</h2>
+        <div class="weather-card">
+          <i data-lucide="cloud-sun"></i>
+          <div>22°C<br><small>Vent 10 km/h</small></div>
+        </div>
+      </section>
+
+      <!-- Bouton centrer la carte -->
+      <div class="center-map">
+        <button id="btn-center"> <i data-lucide="map-pin"></i> Centrer la carte</button>
+      </div>
+      
+    </aside>
+
+    <!-- Carte Leaflet -->
+    <main class="map-container">
+      <div id="map"></div>
+    </main>
+  </div>
 
 
-     <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
