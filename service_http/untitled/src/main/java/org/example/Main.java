@@ -17,10 +17,10 @@ public class Main {
         HttpClient client = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(Duration.ofSeconds(20)).build();
-                //.proxy(ProxySelector.of(new InetSocketAddress("proxy.example.com", 80)))
-                //.authenticator(Authenticator.getDefault())
-                //.build();
+                .connectTimeout(Duration.ofSeconds(20))
+                .proxy(ProxySelector.of(new InetSocketAddress("proxy.example.com", 80)))
+                .authenticator(Authenticator.getDefault())
+                .build();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json"))
