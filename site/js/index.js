@@ -303,11 +303,11 @@
         };
         Class.addInitHook = function(fn) {
           var args = Array.prototype.slice.call(arguments, 1);
-          var init = typeof fn === "function" ? fn : function() {
+          var init2 = typeof fn === "function" ? fn : function() {
             this[fn].apply(this, args);
           };
           this.prototype._initHooks = this.prototype._initHooks || [];
-          this.prototype._initHooks.push(init);
+          this.prototype._initHooks.push(init2);
           return this;
         };
         function checkDeprecatedMixinEvents(includes) {
@@ -9647,42 +9647,62 @@
   var NANCY_LAT = 48.692054;
   var NANCY_LON = 6.184417;
   var WEATHER_API_KEY = "cf398fc73cae4d949549dca5ae03a6d4";
-  var WEATHER_API_URL = null;
+  var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
+  var isConfigReady = false;
+  var configPromise = null;
   var initConfig = () => __async(null, null, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
-    try {
-      const response = yield fetch("./config/config.json");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      config = yield response.json();
-      API_VELIBS = ((_a = config.API_VELIBS) == null ? void 0 : _a.address) || API_VELIBS;
-      API_VELIBS_STATIONS = ((_b = config.API_VELIBS) == null ? void 0 : _b.address_stations) || API_VELIBS_STATIONS;
-      API_VELIBS_STATUS = ((_c = config.API_VELIBS) == null ? void 0 : _c.address_status) || API_VELIBS_STATUS;
-      SERVER_IP = ((_d = config.server) == null ? void 0 : _d.ip) || SERVER_IP;
-      SERVER_PORT = ((_e = config.server) == null ? void 0 : _e.port) || SERVER_PORT;
-      API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
-      API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
-      NANCY_LAT = ((_f = config.weather) == null ? void 0 : _f.nancy_lat) || NANCY_LAT;
-      NANCY_LON = ((_g = config.weather) == null ? void 0 : _g.nancy_lon) || NANCY_LON;
-      WEATHER_API_KEY = ((_h = config.weather) == null ? void 0 : _h.api_key) || WEATHER_API_KEY;
-      WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
-      console.log("Configuration charg\xE9e avec succ\xE8s");
-      return true;
-    } catch (error) {
-      console.warn("Erreur lors du chargement de la configuration, utilisation des valeurs par d\xE9faut:", error);
-      API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
-      API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
-      WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
-      return false;
+    if (configPromise) {
+      return configPromise;
     }
+    configPromise = (() => __async(null, null, function* () {
+      var _a, _b, _c, _d, _e, _f, _g, _h;
+      try {
+        const response = yield fetch("./config/config.json");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        config = yield response.json();
+        API_VELIBS = ((_a = config.API_VELIBS) == null ? void 0 : _a.address) || API_VELIBS;
+        API_VELIBS_STATIONS = ((_b = config.API_VELIBS) == null ? void 0 : _b.address_stations) || API_VELIBS_STATIONS;
+        API_VELIBS_STATUS = ((_c = config.API_VELIBS) == null ? void 0 : _c.address_status) || API_VELIBS_STATUS;
+        SERVER_IP = ((_d = config.server) == null ? void 0 : _d.ip) || SERVER_IP;
+        SERVER_PORT = ((_e = config.server) == null ? void 0 : _e.port) || SERVER_PORT;
+        API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
+        API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
+        NANCY_LAT = ((_f = config.weather) == null ? void 0 : _f.nancy_lat) || NANCY_LAT;
+        NANCY_LON = ((_g = config.weather) == null ? void 0 : _g.nancy_lon) || NANCY_LON;
+        WEATHER_API_KEY = ((_h = config.weather) == null ? void 0 : _h.api_key) || WEATHER_API_KEY;
+        WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
+        isConfigReady = true;
+        return true;
+      } catch (error) {
+        console.warn("Erreur lors du chargement de la configuration, utilisation des valeurs par d\xE9faut:", error);
+        API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
+        API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
+        WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
+        isConfigReady = true;
+        return false;
+      }
+    }))();
+    return configPromise;
   });
   var reloadConfig = () => __async(null, null, function* () {
+    configPromise = null;
+    isConfigReady = false;
     return yield initConfig();
+  });
+  var waitForConfig = () => __async(null, null, function* () {
+    if (!isConfigReady) {
+      yield initConfig();
+    }
   });
   var config_default = {
     initConfig,
     reloadConfig,
+    waitForConfig,
+    get isConfigReady() {
+      return isConfigReady;
+    },
     get API_VELIBS() {
       return API_VELIBS;
     },
@@ -26886,14 +26906,18 @@
 
   // modules/restau.js
   var restauMarkers = import_leaflet3.default.layerGroup();
+  function fetchRestaurants() {
+    return __async(this, null, function* () {
+      const response = yield fetch(config_default.API_RESTAU);
+      const data = yield response.json();
+      return data;
+    });
+  }
   function createMarker2(map) {
     return __async(this, null, function* () {
-      const nancyLat = 48.6921;
-      const nancyLon = 6.1844;
-      for (let i = 0; i < 10; i++) {
-        const lat2 = nancyLat + (Math.random() - 0.5) * 0.02;
-        const lon2 = nancyLon + (Math.random() - 0.5) * 0.02;
-        const marker = import_leaflet3.default.marker([lat2, lon2], {
+      const restaurants = yield fetchRestaurants();
+      restaurants.forEach((restaurant) => {
+        const marker = import_leaflet3.default.marker([restaurant.latitude, restaurant.longitude], {
           icon: import_leaflet3.default.icon({
             iconUrl: "icons/restaurant.png",
             iconSize: [48, 48],
@@ -26902,13 +26926,6 @@
           })
         });
         restauMarkers.addLayer(marker);
-        const restaurant = {
-          id: i + 1,
-          name: `Restaurant ${i + 1}`,
-          address: `Rue al\xE9atoire ${i + 1}, Nancy`,
-          hours: "11h30-14h30, 18h30-22h30",
-          rating: (Math.random() * 5).toFixed(1)
-        };
         marker.on("click", () => {
           const reservationsSection = document.querySelector("section#restaurants");
           reservationsSection.innerHTML = `
@@ -26916,8 +26933,7 @@
                 <div class="restaurant-details">
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>
-                    <p><strong>Horaires:</strong> ${restaurant.hours}</p>
-                    <p><strong>Note:</strong> ${restaurant.rating}/5</p>
+                    <p><strong>T\xE9l\xE9phone:</strong> ${restaurant.phone}</p>
                     <button id="reserve-btn"><i data-lucide="calendar"></i> R\xE9server</button>
                 </div>
             `;
@@ -26926,7 +26942,7 @@
           });
           createIcons({ icons: iconsAndAliases_exports });
         });
-      }
+      });
       restauMarkers.addTo(map);
     });
   }
@@ -27053,7 +27069,6 @@
     return __async(this, null, function* () {
       const response = yield fetch(config_default.WEATHER_API_URL);
       const data = yield response.json();
-      console.log(data);
       return data;
     });
   }
@@ -27062,7 +27077,7 @@
       const data = yield fetchMeteo();
       const degres = Math.round(data.main.temp);
       const vent = Math.round(data.wind.speed);
-      let icon = "11d";
+      let icon = data.weather[0].icon;
       switch (icon) {
         case "01d":
           icon = "sun";
@@ -27134,7 +27149,12 @@
   };
 
   // index.js
-  config_default.initConfig();
+  function init() {
+    return __async(this, null, function* () {
+      yield config_default.initConfig();
+    });
+  }
+  init();
   var lat = 48.692054;
   var lon = 6.184417;
   var myMap = map_default.setupMap("map", [lat, lon], 14);

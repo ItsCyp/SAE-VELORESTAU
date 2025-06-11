@@ -5,7 +5,6 @@ import { createIcons, icons } from "lucide";
 async function fetchMeteo() {
     const response = await fetch(config.WEATHER_API_URL);
     const data = await response.json();
-    console.log(data);
     return data;
 }
 
@@ -13,7 +12,7 @@ async function modifyMeteo() {
     const data = await fetchMeteo();
     const degres = Math.round(data.main.temp);  
     const vent = Math.round(data.wind.speed);
-    let icon = "11d";
+    let icon = data.weather[0].icon;
     switch(icon) {
         case '01d':
             icon = 'sun';

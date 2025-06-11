@@ -7,7 +7,11 @@ import meteo from "./modules/meteo.js";
 import config from "./modules/config.js";
 import { createIcons, icons } from "lucide";
 
-config.initConfig();
+async function init() {
+    await config.initConfig();
+}
+
+init();
 
 // coordonnées de Nancy
 let lat = 48.692054;
@@ -48,11 +52,6 @@ document.getElementById('chk-incidents').addEventListener('change', (event) => {
 document.getElementById('btn-center').addEventListener('click', () => {
     myMap.setView([lat, lon], 14);
 });
-
-
-
-
-
 
 
 document.addEventListener('DOMContentLoaded', () => {

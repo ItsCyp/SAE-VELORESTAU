@@ -5,21 +5,18 @@ import { createIcons, icons } from "lucide";
 let restauMarkers = L.layerGroup();
 
 async function fetchRestaurants(){
-
+    const response = await fetch(config.API_RESTAU);
+    const data = await response.json();
+    return data;
 }
 
 async function createMarker(map){
-    // Coordonnées de Nancy
-    const nancyLat = 48.6921;
-    const nancyLon = 6.1844;
+    // Récupérer les données des restaurants depuis l'API
+    const restaurants = await fetchRestaurants();
     
-    // Générer 10 restaurants aléatoires autour de Nancy
-    for(let i = 0; i < 10; i++) {
-        // Générer des coordonnées aléatoires dans un rayon de ~2km autour de Nancy
-        const lat = nancyLat + (Math.random() - 0.5) * 0.02;
-        const lon = nancyLon + (Math.random() - 0.5) * 0.02;
-        
-        const marker = L.marker([lat, lon], {
+    // Créer un marqueur pour chaque restaurant
+    restaurants.forEach(restaurant => {
+        const marker = L.marker([restaurant.latitude, restaurant.longitude], {
             icon: L.icon({
                 iconUrl: 'icons/restaurant.png',
                 iconSize: [48, 48],
@@ -28,15 +25,6 @@ async function createMarker(map){
             })
         });
         restauMarkers.addLayer(marker);
-
-        // Créer les données du restaurant
-        const restaurant = {
-            id: i + 1,
-            name: `Restaurant ${i + 1}`,
-            address: `Rue aléatoire ${i + 1}, Nancy`,
-            hours: '11h30-14h30, 18h30-22h30',
-            rating: (Math.random() * 5).toFixed(1)
-        };
 
         // Gérer le clic sur le marqueur
         marker.on('click', () => {
@@ -47,8 +35,7 @@ async function createMarker(map){
                 <div class="restaurant-details">
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>
-                    <p><strong>Horaires:</strong> ${restaurant.hours}</p>
-                    <p><strong>Note:</strong> ${restaurant.rating}/5</p>
+                    <p><strong>Téléphone:</strong> ${restaurant.phone}</p>
                     <button id="reserve-btn"><i data-lucide="calendar"></i> Réserver</button>
                 </div>
             `;
@@ -58,8 +45,8 @@ async function createMarker(map){
 
             createIcons({ icons });
         });
-        
-    }
+    });
+    
     // Ajouter la couche de marqueurs à la carte
     restauMarkers.addTo(map);
 }
