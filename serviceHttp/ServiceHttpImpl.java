@@ -1,5 +1,3 @@
-package org.example;
-
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -10,6 +8,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.rmi.RemoteException;
 import java.time.Duration;
+import java.util.HashMap;
 
 public class ServiceHttpImpl implements ServiceHttp {
 
@@ -36,19 +35,22 @@ public class ServiceHttpImpl implements ServiceHttp {
     }
 
     @Override
-    public HttpResponse<String> fetchAPI(String url) throws RemoteException {
-        if(httpClient == null){
-            System.err.println("∑x3 bip boup, utilisation d'un client par défaut, risque d'erreur dû à l'absence de proxy ");
-            return null;
+    public HashMap<Integer, String> fetchAPI(String url) throws RemoteException {
+        if (httpClient == null) {
+            System.err.println(
+                    "∑x3 bip boup, utilisation d'un client par défaut, risque d'erreur dû à l'absence de proxy ");
+            init();
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
 
-        HttpResponse<String> response = null;
-        try{
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e){
+        HashMap<Integer, String> response = new HashMap<>();
+        try {
+            HttpResponse<String> cl = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            int len = Integer.parseInt(cl.headers().allValues("Content-Length").getFirst());
+            response.put(len, cl.body());
+        } catch (IOException | InterruptedException e) {
             System.err.println("∑x3 bip boup, y'a une erreur ");
             e.printStackTrace();
         }
