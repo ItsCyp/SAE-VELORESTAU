@@ -9617,7 +9617,7 @@
   });
 
   // index.js
-  var import_leaflet3 = __toESM(require_leaflet_src());
+  var import_leaflet6 = __toESM(require_leaflet_src());
 
   // modules/map.js
   var import_leaflet = __toESM(require_leaflet_src());
@@ -9639,10 +9639,19 @@
   var API_VELIBS = "https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json";
   var API_VELIBS_STATIONS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_information.json";
   var API_VELIBS_STATUS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_status.json";
+  var API_INCIDENTS = "https://carto.g-ny.org/data/cifs/cifs_waze_v2.json";
+  var NANCY_LAT = 48.692054;
+  var NANCY_LON = 6.184417;
+  var WEATHER_API_KEY = "cf398fc73cae4d949549dca5ae03a6d4";
+  var getWeatherApiUrl = () => {
+    return `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
+  };
   var config_default = {
     API_VELIBS,
     API_VELIBS_STATIONS,
-    API_VELIBS_STATUS
+    API_VELIBS_STATUS,
+    API_INCIDENTS,
+    getWeatherApiUrl
   };
 
   // modules/velibs.js
@@ -9707,6 +9716,9 @@
     createMarker,
     velibMarkers
   };
+
+  // modules/restau.js
+  var import_leaflet3 = __toESM(require_leaflet_src());
 
   // node_modules/lucide/dist/esm/defaultAttributes.js
   var defaultAttributes = {
@@ -26820,12 +26832,257 @@
     }
   };
 
+  // modules/restau.js
+  var restauMarkers = import_leaflet3.default.layerGroup();
+  function createMarker2(map) {
+    return __async(this, null, function* () {
+      const nancyLat = 48.6921;
+      const nancyLon = 6.1844;
+      for (let i = 0; i < 10; i++) {
+        const lat2 = nancyLat + (Math.random() - 0.5) * 0.02;
+        const lon2 = nancyLon + (Math.random() - 0.5) * 0.02;
+        const marker = import_leaflet3.default.marker([lat2, lon2], {
+          icon: import_leaflet3.default.icon({
+            iconUrl: "icons/restaurant.png",
+            iconSize: [48, 48],
+            iconAnchor: [24, 24],
+            popupAnchor: [0, -10]
+          })
+        });
+        restauMarkers.addLayer(marker);
+        const restaurant = {
+          id: i + 1,
+          name: `Restaurant ${i + 1}`,
+          address: `Rue al\xE9atoire ${i + 1}, Nancy`,
+          hours: "11h30-14h30, 18h30-22h30",
+          rating: (Math.random() * 5).toFixed(1)
+        };
+        marker.on("click", () => {
+          const reservationsSection = document.querySelector("section#restaurants");
+          reservationsSection.innerHTML = `
+                <h2><i data-lucide="coffee"></i> Restaurant s\xE9lectionn\xE9</h2>
+                <div class="restaurant-details">
+                    <h3>${restaurant.name}</h3>
+                    <p><strong>Adresse:</strong> ${restaurant.address}</p>
+                    <p><strong>Horaires:</strong> ${restaurant.hours}</p>
+                    <p><strong>Note:</strong> ${restaurant.rating}/5</p>
+                    <button id="reserve-btn"><i data-lucide="calendar"></i> R\xE9server</button>
+                </div>
+            `;
+          document.querySelector("#reserve-btn").addEventListener("click", () => {
+            reserveRestaurant(restaurant.id);
+          });
+          createIcons({ icons: iconsAndAliases_exports });
+        });
+      }
+      restauMarkers.addTo(map);
+    });
+  }
+  function showReservationModal(restaurantId) {
+    const modal = document.createElement("div");
+    modal.className = "reservation-modal";
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>R\xE9server une table</h2>
+            <div class="tables-list">
+                <h3>Tables disponibles</h3>
+                <div class="tables-grid">
+                    ${generateTablesList()}
+                </div>
+            </div>
+            <div class="reservation-form">
+                <h3>D\xE9tails de la r\xE9servation</h3>
+                <form id="reservation-form">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Heure:</label>
+                        <input type="time" id="time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guests">Nombre de personnes:</label>
+                        <input type="number" id="guests" min="1" max="8" required>
+                    </div>
+                    <button type="submit" class="submit-reservation">Confirmer la r\xE9servation</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    const closeBtn = modal.querySelector(".close-modal");
+    closeBtn.onclick = () => {
+      modal.remove();
+    };
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.remove();
+      }
+    };
+    const form = modal.querySelector("#reservation-form");
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const date = form.querySelector("#date").value;
+      const time = form.querySelector("#time").value;
+      const guests = form.querySelector("#guests").value;
+      alert(`R\xE9servation confirm\xE9e pour le ${date} \xE0 ${time} pour ${guests} personnes`);
+      modal.remove();
+    };
+  }
+  function generateTablesList() {
+    let tablesHtml = "";
+    for (let i = 1; i <= 10; i++) {
+      const capacity = Math.floor(Math.random() * 4) + 2;
+      tablesHtml += `
+            <div class="table-item">
+                <input type="radio" name="table" id="table-${i}" value="${i}">
+                <label for="table-${i}">
+                    Table ${i}
+                    <span class="capacity">(${capacity} personnes)</span>
+                </label>
+            </div>
+        `;
+    }
+    return tablesHtml;
+  }
+  function reserveRestaurant(restaurantId) {
+    showReservationModal(restaurantId);
+  }
+  var restau_default = {
+    createMarker: createMarker2,
+    reserveRestaurant,
+    restauMarkers
+  };
+
+  // modules/incidents.js
+  var import_leaflet4 = __toESM(require_leaflet_src());
+  var incidentMarkers = import_leaflet4.default.layerGroup();
+  function fetchIncidents() {
+    return __async(this, null, function* () {
+      const response = yield fetch(config_default.API_INCIDENTS);
+      const data = yield response.json();
+      console.log(data);
+      return data.incidents;
+    });
+  }
+  function createMarker3(map) {
+    return __async(this, null, function* () {
+      const incidents = yield fetchIncidents();
+      const warningIcon = import_leaflet4.default.icon({
+        iconUrl: "icons/warning.png",
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -10]
+      });
+      incidents.forEach((incident) => {
+        const marker = import_leaflet4.default.marker([incident.lat, incident.lon], { icon: warningIcon });
+        incidentMarkers.addLayer(marker);
+        const popupContent = `
+            <div style="min-width: 200px;">
+                <h3 style="margin: 0 0 10px 0;">${incident.description}</h3>
+                <p style="margin: 5px 0;"><strong>Date:</strong> ${incident.date}</p>
+                <p style="margin: 5px 0;"><strong>Statut:</strong> ${incident.status}</p>
+            </div>
+        `;
+        marker.bindPopup(popupContent);
+      });
+      incidentMarkers.addTo(map);
+    });
+  }
+  var incidents_default = {
+    createMarker: createMarker3
+  };
+
+  // modules/meteo.js
+  var import_leaflet5 = __toESM(require_leaflet_src());
+  function fetchMeteo() {
+    return __async(this, null, function* () {
+      const response = yield fetch(config_default.getWeatherApiUrl());
+      const data = yield response.json();
+      console.log(data);
+      return data;
+    });
+  }
+  function modifyMeteo() {
+    return __async(this, null, function* () {
+      const data = yield fetchMeteo();
+      const degres = Math.round(data.main.temp);
+      const vent = Math.round(data.wind.speed);
+      let icon = data.weather[0].icon;
+      switch (icon) {
+        case "01d":
+          icon = "sun";
+          break;
+        case "01n":
+          icon = "moon";
+          break;
+        case "02d":
+          icon = "cloud-sun";
+          break;
+        case "02n":
+          icon = "cloud-moon";
+          break;
+        case "03d":
+          icon = "cloud";
+          break;
+        case "03n":
+          icon = "cloud";
+          break;
+        case "09d":
+          icon = "cloud-sun-rain";
+          break;
+        case "09n":
+          icon = "cloud-moon-rain";
+          break;
+        case "10d":
+          icon = "cloud-rain";
+          break;
+        case "10n":
+          icon = "cloud-rain";
+          break;
+        case "11d":
+          icon = "cloud-lightning";
+          break;
+        case "11n":
+          icon = "cloud-lightning";
+          break;
+        case "13d":
+          icon = "cloud-snow";
+          break;
+        case "13n":
+          icon = "cloud-snow";
+          break;
+        case "50d":
+          icon = "cloud-fog";
+          break;
+        case "50n":
+          icon = "cloud-fog";
+          break;
+        default:
+          icon = "sun";
+          break;
+      }
+      document.querySelector("section.weather .weather-card").innerHTML = `
+        <i data-lucide="${icon}"></i>
+        <div>${degres}\xB0C<br><small>Vent ${vent} km/h</small></div>
+    `;
+      createIcons({ icons: iconsAndAliases_exports });
+    });
+  }
+  var meteo_default = {
+    modifyMeteo
+  };
+
   // index.js
-  createIcons({ icons: iconsAndAliases_exports });
   var lat = 48.692054;
   var lon = 6.184417;
-  var myMap = map_default.setupMap("map", [lat, lon], 13);
+  var myMap = map_default.setupMap("map", [lat, lon], 14);
   velibs_default.createMarker(myMap);
+  restau_default.createMarker(myMap);
+  incidents_default.createMarker(myMap);
+  meteo_default.modifyMeteo();
   document.getElementById("chk-velibs").addEventListener("change", (event) => {
     if (event.target.checked) {
       myMap.addLayer(velibs_default.velibMarkers);
@@ -26833,8 +27090,25 @@
       myMap.removeLayer(velibs_default.velibMarkers);
     }
   });
+  document.getElementById("chk-restaurants").addEventListener("change", (event) => {
+    if (event.target.checked) {
+      myMap.addLayer(restau_default.restauMarkers);
+    } else {
+      myMap.removeLayer(restau_default.restauMarkers);
+    }
+  });
+  document.getElementById("chk-incidents").addEventListener("change", (event) => {
+    if (event.target.checked) {
+      myMap.addLayer(incidents_default.incidentMarkers);
+    } else {
+      myMap.removeLayer(incidents_default.incidentMarkers);
+    }
+  });
   document.getElementById("btn-center").addEventListener("click", () => {
-    myMap.setView([lat, lon], 13);
+    myMap.setView([lat, lon], 14);
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    createIcons({ icons: iconsAndAliases_exports });
   });
 })();
 /*! Bundled license information:
