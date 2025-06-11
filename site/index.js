@@ -4,7 +4,10 @@ import velibs from "./modules/velibs.js";
 import restau from "./modules/restau.js";
 import incidents from "./modules/incidents.js";
 import meteo from "./modules/meteo.js";
+import config from "./modules/config.js";
 import { createIcons, icons } from "lucide";
+
+config.initConfig();
 
 // coordonnées de Nancy
 let lat = 48.692054;
