@@ -64,6 +64,20 @@ public class DatabaseManager {
                         insert.setDouble(4, 6.1836);
                         insert.setString(5, "03 83 77 88 99");
                         insert.executeUpdate();
+
+                        insert.setString(1, "Chez Luigi");
+                        insert.setString(2, "20 Rue des Dominicains, 54000 Nancy");
+                        insert.setDouble(3, 48.6931);
+                        insert.setDouble(4, 6.1825);
+                        insert.setString(5, "03 83 12 34 56");
+                        insert.executeUpdate();
+
+                        insert.setString(1, "L'Estaminet");
+                        insert.setString(2, "8 Rue des Soeurs Macarons, 54000 Nancy");
+                        insert.setDouble(3, 48.6925);
+                        insert.setDouble(4, 6.1842);
+                        insert.setString(5, "03 83 98 76 54");
+                        insert.executeUpdate();
                     }
                 }
             }
