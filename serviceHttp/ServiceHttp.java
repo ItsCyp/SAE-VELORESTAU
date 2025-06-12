@@ -1,7 +1,5 @@
-import java.net.http.HttpResponse;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 
 public interface ServiceHttp extends Remote {
 
@@ -9,6 +7,6 @@ public interface ServiceHttp extends Remote {
 
     void init() throws RemoteException;
 
-    HashMap<Integer, String> fetchAPI(String url) throws RemoteException;
+    DataTransfer fetchAPI(String url) throws RemoteException;
 
 }

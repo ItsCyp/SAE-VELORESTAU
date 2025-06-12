@@ -10,6 +10,8 @@ import java.rmi.RemoteException;
 import java.time.Duration;
 import java.util.HashMap;
 
+import javax.xml.crypto.Data;
+
 public class ServiceHttpImpl implements ServiceHttp {
 
     private HttpClient httpClient;
@@ -35,7 +37,7 @@ public class ServiceHttpImpl implements ServiceHttp {
     }
 
     @Override
-    public HashMap<Integer, String> fetchAPI(String url) throws RemoteException {
+    public DataTransfer fetchAPI(String url) throws RemoteException {
         if (httpClient == null) {
             System.err.println(
                     "∑x3 bip boup, utilisation d'un client par défaut, risque d'erreur dû à l'absence de proxy ");
@@ -45,11 +47,11 @@ public class ServiceHttpImpl implements ServiceHttp {
                 .uri(URI.create(url))
                 .build();
 
-        HashMap<Integer, String> response = new HashMap<>();
+        DataTransfer response = null;
         try {
             HttpResponse<String> cl = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             int len = Integer.parseInt(cl.headers().allValues("Content-Length").getFirst());
-            response.put(len, cl.body());
+            response = new DataTransfer(len, cl.body());
         } catch (IOException | InterruptedException e) {
             System.err.println("∑x3 bip boup, y'a une erreur ");
             e.printStackTrace();
