@@ -303,11 +303,11 @@
         };
         Class.addInitHook = function(fn) {
           var args = Array.prototype.slice.call(arguments, 1);
-          var init2 = typeof fn === "function" ? fn : function() {
+          var init = typeof fn === "function" ? fn : function() {
             this[fn].apply(this, args);
           };
           this.prototype._initHooks = this.prototype._initHooks || [];
-          this.prototype._initHooks.push(init2);
+          this.prototype._initHooks.push(init);
           return this;
         };
         function checkDeprecatedMixinEvents(includes) {
@@ -9636,97 +9636,21 @@
   var import_leaflet2 = __toESM(require_leaflet_src());
 
   // modules/config.js
-  var config = null;
-  var API_VELIBS = "https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json";
   var API_VELIBS_STATIONS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_information.json";
   var API_VELIBS_STATUS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_status.json";
-  var SERVER_IP = "localhost";
-  var SERVER_PORT = "3000";
-  var API_INCIDENTS = null;
-  var API_RESTAU = null;
-  var NANCY_LAT = 48.692054;
-  var NANCY_LON = 6.184417;
-  var WEATHER_API_KEY = "cf398fc73cae4d949549dca5ae03a6d4";
-  var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
-  var isConfigReady = false;
-  var configPromise = null;
-  var initConfig = () => __async(null, null, function* () {
-    if (configPromise) {
-      return configPromise;
-    }
-    configPromise = (() => __async(null, null, function* () {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
-      try {
-        const response = yield fetch("./config/config.json");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        config = yield response.json();
-        API_VELIBS = ((_a = config.API_VELIBS) == null ? void 0 : _a.address) || API_VELIBS;
-        API_VELIBS_STATIONS = ((_b = config.API_VELIBS) == null ? void 0 : _b.address_stations) || API_VELIBS_STATIONS;
-        API_VELIBS_STATUS = ((_c = config.API_VELIBS) == null ? void 0 : _c.address_status) || API_VELIBS_STATUS;
-        SERVER_IP = ((_d = config.server) == null ? void 0 : _d.ip) || SERVER_IP;
-        SERVER_PORT = ((_e = config.server) == null ? void 0 : _e.port) || SERVER_PORT;
-        API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
-        API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
-        NANCY_LAT = ((_f = config.weather) == null ? void 0 : _f.nancy_lat) || NANCY_LAT;
-        NANCY_LON = ((_g = config.weather) == null ? void 0 : _g.nancy_lon) || NANCY_LON;
-        WEATHER_API_KEY = ((_h = config.weather) == null ? void 0 : _h.api_key) || WEATHER_API_KEY;
-        WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
-        isConfigReady = true;
-        return true;
-      } catch (error) {
-        console.warn("Erreur lors du chargement de la configuration, utilisation des valeurs par d\xE9faut:", error);
-        API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
-        API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
-        WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${NANCY_LAT}&lon=${NANCY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=fr`;
-        isConfigReady = true;
-        return false;
-      }
-    }))();
-    return configPromise;
-  });
-  var reloadConfig = () => __async(null, null, function* () {
-    configPromise = null;
-    isConfigReady = false;
-    return yield initConfig();
-  });
-  var waitForConfig = () => __async(null, null, function* () {
-    if (!isConfigReady) {
-      yield initConfig();
-    }
-  });
+  var SERVER_IP = "100.64.80.62";
+  var SERVER_PORT = "8008";
+  var API_INCIDENTS = "https://" + SERVER_IP + ":" + SERVER_PORT + "/api/accidents";
+  var API_RESTAU = "https://" + SERVER_IP + ":" + SERVER_PORT + "/api/restau";
+  var WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather?lat=48.692054&lon=6.184417&appid=cf398fc73cae4d949549dca5ae03a6d4&units=metric";
   var config_default = {
-    initConfig,
-    reloadConfig,
-    waitForConfig,
-    get isConfigReady() {
-      return isConfigReady;
-    },
-    get API_VELIBS() {
-      return API_VELIBS;
-    },
-    get API_VELIBS_STATIONS() {
-      return API_VELIBS_STATIONS;
-    },
-    get API_VELIBS_STATUS() {
-      return API_VELIBS_STATUS;
-    },
-    get API_INCIDENTS() {
-      return API_INCIDENTS;
-    },
-    get API_RESTAU() {
-      return API_RESTAU;
-    },
-    get WEATHER_API_URL() {
-      return WEATHER_API_URL;
-    },
-    get SERVER_IP() {
-      return SERVER_IP;
-    },
-    get SERVER_PORT() {
-      return SERVER_PORT;
-    }
+    API_VELIBS_STATIONS,
+    API_VELIBS_STATUS,
+    API_INCIDENTS,
+    API_RESTAU,
+    WEATHER_API_URL,
+    SERVER_IP,
+    SERVER_PORT
   };
 
   // modules/velibs.js
@@ -27060,7 +26984,8 @@
     });
   }
   var incidents_default = {
-    createMarker: createMarker3
+    createMarker: createMarker3,
+    incidentMarkers
   };
 
   // modules/meteo.js
@@ -27149,12 +27074,6 @@
   };
 
   // index.js
-  function init() {
-    return __async(this, null, function* () {
-      yield config_default.initConfig();
-    });
-  }
-  init();
   var lat = 48.692054;
   var lon = 6.184417;
   var myMap = map_default.setupMap("map", [lat, lon], 14);

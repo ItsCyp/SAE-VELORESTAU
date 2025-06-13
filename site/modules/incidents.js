@@ -42,6 +42,7 @@ async function createMarker(map) {
 
 
 export default {
-    createMarker: createMarker
+    createMarker: createMarker,
+    incidentMarkers: incidentMarkers
 }
 
