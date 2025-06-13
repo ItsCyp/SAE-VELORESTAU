@@ -3,20 +3,22 @@ public class TestDbConnection {
         DatabaseManager manager = new DatabaseManager();
         try (java.sql.Connection conn = manager.getConnection()) {
             System.out.println("Database connection OK: " + (conn != null));
+            System.out.println("Connected as: " + conn.getMetaData().getUserName());
         } catch (Exception e) {
-            System.err.println("Failed to connect to database");
+            System.err.println("Failed to connect to Oracle database");
             e.printStackTrace();
             return;
         }
 
         try {
+            System.out.println("Retrieving restaurants from Oracle database...");
             ServiceDb service = new ServiceDbImpl();
             String json = service.getRestaurants();
             org.json.JSONArray arr = new org.json.JSONArray(json);
             System.out.println("Retrieved " + arr.length() + " restaurants as JSON");
             System.out.println(json);
         } catch (Exception e) {
-            System.err.println("Failed to retrieve restaurants");
+            System.err.println("Failed to retrieve restaurants from Oracle");
             e.printStackTrace();
         }
     }

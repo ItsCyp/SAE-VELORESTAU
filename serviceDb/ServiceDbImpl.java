@@ -18,19 +18,27 @@ public class ServiceDbImpl extends UnicastRemoteObject implements ServiceDb {
 
     @Override
     public String getRestaurants() throws RemoteException {
+        System.out.println("getRestaurants called");
         JSONArray array = new JSONArray();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "SELECT id,name,address,latitude,longitude,phone FROM restaurants")) {
+                     "SELECT * FROM restaurants")) {
             ResultSet rs = ps.executeQuery();
+            System.out.println(ps.toString());
             while (rs.next()) {
                 JSONObject o = new JSONObject();
-                o.put("id", rs.getInt("id"));
+                o.put("id", rs.getInt("id")); 
+                System.out.println("Processing restaurant ID: " + rs.getInt("id"));
                 o.put("name", rs.getString("name"));
+                System.out.println("Processing restaurant name: " + rs.getString("name"));
                 o.put("address", rs.getString("address"));
+                System.out.println("Processing restaurant address: " + rs.getString("address"));
                 o.put("latitude", rs.getDouble("latitude"));
+                System.out.println("Processing restaurant latitude: " + rs.getDouble("latitude"));
                 o.put("longitude", rs.getDouble("longitude"));
+                System.out.println("Processing restaurant longitude: " + rs.getDouble("longitude"));
                 o.put("phone", rs.getString("phone"));
+                System.out.println("Processing restaurant phone: " + rs.getString("phone"));
                 array.put(o);
             }
         } catch (SQLException e) {
