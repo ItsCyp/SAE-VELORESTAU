@@ -9616,6 +9616,28 @@
     }
   });
 
+  // config/config.json
+  var require_config = __commonJS({
+    "config/config.json"(exports, module) {
+      module.exports = {
+        server: {
+          ip: "127.0.0.1",
+          port: "8008"
+        },
+        weather: {
+          api_key: "cf398fc73cae4d949549dca5ae03a6d4",
+          nancy_lat: 48.692054,
+          nancy_lon: 6.184417
+        },
+        API_VELIBS: {
+          address: "https://api.cyclocity.fr/contracts/nancy/gbfs/gbfs.json",
+          address_stations: "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_information.json",
+          address_status: "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_status.json"
+        }
+      };
+    }
+  });
+
   // index.js
   var import_leaflet6 = __toESM(require_leaflet_src());
 
@@ -9636,21 +9658,20 @@
   var import_leaflet2 = __toESM(require_leaflet_src());
 
   // modules/config.js
-  var API_VELIBS_STATIONS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_information.json";
-  var API_VELIBS_STATUS = "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_status.json";
-  var SERVER_IP = "100.64.80.62";
-  var SERVER_PORT = "8008";
-  var API_INCIDENTS = "https://" + SERVER_IP + ":" + SERVER_PORT + "/api/accidents";
-  var API_RESTAU = "https://" + SERVER_IP + ":" + SERVER_PORT + "/api/restau";
-  var WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather?lat=48.692054&lon=6.184417&appid=cf398fc73cae4d949549dca5ae03a6d4&units=metric";
+  var config = require_config();
+  var SERVER_IP = config.server.ip;
+  var SERVER_PORT = config.server.port;
+  var API_VELIBS_STATIONS = config.API_VELIBS.address_stations;
+  var API_VELIBS_STATUS = config.API_VELIBS.address_status;
+  var API_INCIDENTS = `http://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
+  var API_RESTAU = `http://${SERVER_IP}:${SERVER_PORT}/api/restau`;
+  var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${config.weather.nancy_lat}&lon=${config.weather.nancy_lon}&appid=${config.weather.api_key}&units=metric`;
   var config_default = {
     API_VELIBS_STATIONS,
     API_VELIBS_STATUS,
     API_INCIDENTS,
     API_RESTAU,
-    WEATHER_API_URL,
-    SERVER_IP,
-    SERVER_PORT
+    WEATHER_API_URL
   };
 
   // modules/velibs.js
@@ -26955,7 +26976,6 @@
     return __async(this, null, function* () {
       const response = yield fetch(config_default.API_INCIDENTS);
       const data = yield response.json();
-      console.log(data);
       return data.incidents;
     });
   }
@@ -26969,13 +26989,18 @@
         popupAnchor: [0, -10]
       });
       incidents.forEach((incident) => {
-        const marker = import_leaflet4.default.marker([incident.lat, incident.lon], { icon: warningIcon });
+        const coordinates = incident.location.polyline.split(" ").map(Number);
+        const marker = import_leaflet4.default.marker([coordinates[0], coordinates[1]], { icon: warningIcon });
         incidentMarkers.addLayer(marker);
         const popupContent = `
             <div style="min-width: 200px;">
-                <h3 style="margin: 0 0 10px 0;">${incident.description}</h3>
-                <p style="margin: 5px 0;"><strong>Date:</strong> ${incident.date}</p>
-                <p style="margin: 5px 0;"><strong>Statut:</strong> ${incident.status}</p>
+                <h3 style="margin: 0 0 10px 0;">${incident.short_description}</h3>
+                <p style="margin: 5px 0;"><strong>Description:</strong> ${incident.description}</p>
+                <p style="margin: 5px 0;"><strong>Lieu:</strong> ${incident.location.location_description}</p>
+                <p style="margin: 5px 0;"><strong>D\xE9but:</strong> ${new Date(incident.starttime).toLocaleDateString()}</p>
+                <p style="margin: 5px 0;"><strong>Fin:</strong> ${new Date(incident.endtime).toLocaleDateString()}</p>
+                <p style="margin: 5px 0;"><strong>Source:</strong> ${incident.source.name}</p>
+                <p style="margin: 5px 0;"><strong>Derni\xE8re mise \xE0 jour:</strong> ${new Date(incident.updatetime).toLocaleString()}</p>
             </div>
         `;
         marker.bindPopup(popupContent);
