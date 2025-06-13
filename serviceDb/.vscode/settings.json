@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "."
+    ],
+    "java.project.referencedLibraries": [
+        "lib\\jdbc.jar",
+        "lib\\json-20250517.jar"
+    ]
+}
