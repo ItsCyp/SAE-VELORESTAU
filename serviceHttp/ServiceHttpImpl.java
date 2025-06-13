@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -15,20 +17,36 @@ import javax.xml.crypto.Data;
 public class ServiceHttpImpl implements ServiceHttp {
 
     private HttpClient httpClient;
+    private HashMap<String, String> conf;
 
-    @Override
-    public void init(String adresseProxy, int portProxy) throws RemoteException {
+    public ServiceHttpImpl(String config){
+        this.conf = new HashMap<>();
+        try{
+            this.getConf(config);
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+
+
+        if(this.conf.containsKey("proxy-address")){
+            System.out.println("faut passer par là, non mais !");
+            this.init(conf.get("proxy-address"), Integer.parseInt(conf.get("proxy-port")));
+        } else {
+            this.init();
+        }
+    }
+
+    public void init(String adresseProxy, int portProxy) {
+
         this.httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
-                .proxy(ProxySelector.of(new InetSocketAddress(adresseProxy, portProxy)))
-                .authenticator(Authenticator.getDefault())
+                .proxy(ProxySelector.of(new InetSocketAddress("www-cache.iutnc.univ-lorraine.fr", 3128)))
                 .build();
     }
 
-    @Override
-    public void init() throws RemoteException {
+    public void init() {
         this.httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
@@ -36,8 +54,8 @@ public class ServiceHttpImpl implements ServiceHttp {
                 .build();
     }
 
-    @Override
     public DataTransfer fetchAPI(String url) throws RemoteException {
+        System.out.println("ca passe dans fetchAPI");
         if (httpClient == null) {
             System.err.println(
                     "∑x3 bip boup, utilisation d'un client par défaut, risque d'erreur dû à l'absence de proxy ");
@@ -56,6 +74,21 @@ public class ServiceHttpImpl implements ServiceHttp {
             System.err.println("∑x3 bip boup, y'a une erreur ");
             e.printStackTrace();
         }
+        System.out.println("ca renvoie le résultat du fecth");
         return response;
+    }
+
+    private void getConf(String confFile) throws IOException {
+        HashMap<String, String> conf = new HashMap<>();
+        BufferedReader buff = new BufferedReader(new FileReader(confFile));
+        String line = buff.readLine();
+        while (line != null) {
+            String[] split = line.split(": ");
+            conf.put(split[0], split[1]);
+            line = buff.readLine();
+        }
+        buff.close();
+
+        this.conf = conf;
     }
 }

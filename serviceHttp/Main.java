@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, NotBoundException {
-        ServiceHttpImpl http = new ServiceHttpImpl();
+        ServiceHttpImpl http = new ServiceHttpImpl(args[1]);
 
         Registry registry = LocateRegistry.getRegistry(args[0]);
         System.out.println("reg : " + String.valueOf(registry));
@@ -19,4 +19,6 @@ public class Main {
         serveur.enregistrerServiceHttp(service);
 
     }
+
+    
 }
