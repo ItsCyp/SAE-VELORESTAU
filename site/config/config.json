@@ -1,6 +1,6 @@
 {
     "server": {
-        "ip": "100.64.80.62",
+        "ip": "127.0.0.1",
         "port": "8008"
     },
     "weather": {
@@ -13,4 +13,4 @@
         "address_stations": "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_information.json",
         "address_status": "https://api.cyclocity.fr/contracts/nancy/gbfs/v3/station_status.json"
     }
-} 
+}

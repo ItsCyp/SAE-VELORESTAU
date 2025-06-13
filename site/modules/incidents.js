@@ -7,7 +7,6 @@ let incidentMarkers = L.layerGroup();
 async function fetchIncidents() {
     const response = await fetch(config.API_INCIDENTS);
     const data = await response.json();
-    console.log(data);
     return data.incidents;
 }
 
@@ -22,14 +21,19 @@ async function createMarker(map) {
     });
 
     incidents.forEach(incident => {
-        const marker = L.marker([incident.lat, incident.lon], {icon: warningIcon});
+        const coordinates = incident.location.polyline.split(' ').map(Number);
+        const marker = L.marker([coordinates[0], coordinates[1]], {icon: warningIcon});
         incidentMarkers.addLayer(marker);
 
         const popupContent = `
             <div style="min-width: 200px;">
-                <h3 style="margin: 0 0 10px 0;">${incident.description}</h3>
-                <p style="margin: 5px 0;"><strong>Date:</strong> ${incident.date}</p>
-                <p style="margin: 5px 0;"><strong>Statut:</strong> ${incident.status}</p>
+                <h3 style="margin: 0 0 10px 0;">${incident.short_description}</h3>
+                <p style="margin: 5px 0;"><strong>Description:</strong> ${incident.description}</p>
+                <p style="margin: 5px 0;"><strong>Lieu:</strong> ${incident.location.location_description}</p>
+                <p style="margin: 5px 0;"><strong>Début:</strong> ${new Date(incident.starttime).toLocaleDateString()}</p>
+                <p style="margin: 5px 0;"><strong>Fin:</strong> ${new Date(incident.endtime).toLocaleDateString()}</p>
+                <p style="margin: 5px 0;"><strong>Source:</strong> ${incident.source.name}</p>
+                <p style="margin: 5px 0;"><strong>Dernière mise à jour:</strong> ${new Date(incident.updatetime).toLocaleString()}</p>
             </div>
         `;
 
@@ -42,6 +46,7 @@ async function createMarker(map) {
 
 
 export default {
-    createMarker: createMarker
+    createMarker: createMarker,
+    incidentMarkers: incidentMarkers
 }
 
