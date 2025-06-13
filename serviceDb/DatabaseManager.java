@@ -1,15 +1,18 @@
 import java.sql.*;
 
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:mariadb://localhost:3306/restos_nancy";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "";
+    private static final String DB_URL = "jdbc:mariadb://localhost:3306/velorestau";
+    private static final String DB_USER = "myuser";
+    private static final String DB_PASSWORD = "mdp";
 
     public DatabaseManager() {
         try {
+            // Explicitly load the MariaDB JDBC driver
             Class.forName("org.mariadb.jdbc.Driver");
             init();
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("MariaDB JDBC Driver not found. Please add it to your classpath.", e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
