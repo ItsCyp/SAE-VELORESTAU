@@ -21,16 +21,18 @@ class RestaurantHandler implements HttpHandler {
         try {
             String response = this.serviceDb.getRestaurants();
             if (response != null) {
-                t.sendResponseHeaders(200, response.length());
+                byte[] responseBytes = response.getBytes();
+                t.sendResponseHeaders(200, responseBytes.length);
                 OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
+                os.write(responseBytes);
                 os.close();
             } else {
                 // Si pas de restaurants, on renvoie un tableau vide
                 String emptyResponse = "[]";
-                t.sendResponseHeaders(200, emptyResponse.length());
+                byte[] emptyResponseBytes = emptyResponse.getBytes();
+                t.sendResponseHeaders(200, emptyResponseBytes.length);
                 OutputStream os = t.getResponseBody();
-                os.write(emptyResponse.getBytes());
+                os.write(emptyResponseBytes);
                 os.close();
             }
         } catch (Exception e) {
