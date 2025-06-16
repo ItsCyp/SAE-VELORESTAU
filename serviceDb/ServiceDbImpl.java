@@ -83,15 +83,18 @@ public class ServiceDbImpl implements ServiceDb {
             try (Connection conn = dbManager.getConnection()) {
                 // Vérifier si la table est déjà réservée
                 try (PreparedStatement checkPs = conn.prepareStatement(
-                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_date = TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS')")) {
+                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND " +
+                        "reservation_date BETWEEN TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') - INTERVAL '2' HOUR " +
+                        "AND TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') + INTERVAL '2' HOUR")) {
                     checkPs.setInt(1, restaurantId);
                     checkPs.setInt(2, tableId);
                     checkPs.setString(3, reservationDate);
+                    checkPs.setString(4, reservationDate);
                     
                     ResultSet rs = checkPs.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
                         result.put("status", "error");
-                        result.put("message", "Cette table est déjà réservée pour cette date et heure");
+                        result.put("message", "Cette table est déjà réservée pour cette période (dans un intervalle de 2 heures)");
                         return result.toString();
                     }
                 }

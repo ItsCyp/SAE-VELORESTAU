@@ -1,0 +1,190 @@
+/* Styles spécifiques pour la page compte-rendu */
+.content-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.compte-rendu {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.compte-rendu h1 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 1rem;
+}
+
+.section {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.section h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section h2 i {
+    color: #3498db;
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+.section p {
+    color: #34495e;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.section ul {
+    list-style-type: none;
+    padding-left: 1rem;
+}
+
+.section ul li {
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+    position: relative;
+    color: #34495e;
+}
+
+.section ul li:before {
+    content: "•";
+    color: #3498db;
+    position: absolute;
+    left: 0;
+}
+
+/* Style pour les liens */
+.section a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.section a:hover {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+/* Style pour les diagrammes ou images */
+.diagram {
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style pour les blocs de code */
+.code-block {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 1rem;
+    border-radius: 6px;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+/* Style pour les tableaux */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+th, td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+th {
+    background-color: #3498db;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Style pour les boutons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #24292e;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background-color: #2f363d;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn i {
+    width: 20px;
+    height: 20px;
+    color: white;
+}
+
+/* Amélioration de la visibilité des icônes */
+.section h2 i {
+    color: #3498db;
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+/* Style spécifique pour les icônes dans les liens */
+.nav-links i {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .content-container {
+        padding: 0 1rem;
+    }
+
+    .compte-rendu {
+        padding: 1rem;
+    }
+
+    .compte-rendu h1 {
+        font-size: 2rem;
+    }
+
+    .section {
+        padding: 1rem;
+    }
+
+    .section h2 {
+        font-size: 1.5rem;
+    }
+} 

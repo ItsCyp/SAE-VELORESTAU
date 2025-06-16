@@ -10,8 +10,10 @@ import { createIcons, icons } from "lucide";
 let lat = 48.692054;
 let lon = 6.184417;
 
+// Initialisation de la carte
 const myMap = map.setupMap('map', [lat, lon], 14);
 
+// Initialisation des marqueurs
 velibs.createMarker(myMap);
 restau.createMarker(myMap);
 incidents.createMarker(myMap);
@@ -46,8 +48,8 @@ document.getElementById('btn-center').addEventListener('click', () => {
     myMap.setView([lat, lon], 14);
 });
 
-
-document.addEventListener('DOMContentLoaded', () => {
+// Initialisation des icônes Lucide
+window.addEventListener('load', () => {
     createIcons({ icons });
 });
 

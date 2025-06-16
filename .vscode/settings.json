@@ -1,0 +1,12 @@
+{
+    "java.project.sourcePaths": [
+        "serveurHttp",
+        "serviceDb",
+        "serviceHttp"
+    ],
+    "java.project.referencedLibraries": [
+        "serviceDb\\lib\\json-20250517.jar",
+        "serviceDb\\lib\\mariadb-java-client-3.5.3.jar",
+        "serviceDb\\lib\\ojdbc17.jar"
+    ]
+}

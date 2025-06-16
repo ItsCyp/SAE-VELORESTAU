@@ -38,10 +38,10 @@ async function createMarker(map){
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>
                     <p><strong>Téléphone:</strong> ${restaurant.phone}</p>
-                    <button id="reserve-btn"><i data-lucide="calendar"></i> Réserver</button>
+                    <button class="reserve-btn"><i data-lucide="calendar"></i> Réserver</button>
                 </div>
             `;
-            document.querySelector('#reserve-btn').addEventListener('click', () => {
+            document.querySelector('.reserve-btn').addEventListener('click', () => {
                 reserveRestaurant(restaurant.id);
             });
 
@@ -164,7 +164,6 @@ function showReservationModal(restaurantId) {
             const selectedTable = restaurant.tables.find(t => t.id === parseInt(input.value));
             if (selectedTable) {
                 guestsInput.max = selectedTable.seats;
-                // Si la valeur actuelle est supérieure au nouveau maximum, la réduire
                 if (parseInt(guestsInput.value) > selectedTable.seats) {
                     guestsInput.value = selectedTable.seats;
                 }
@@ -212,8 +211,6 @@ function showReservationModal(restaurantId) {
                 timestamp: new Date().toISOString()
             };
 
-            console.log(reservationData);
-
             // Envoyer la réservation au serveur
             const response = await fetch(`${config.API_RESERVATION}`, {
                 method: 'POST',
@@ -240,6 +237,8 @@ function showReservationModal(restaurantId) {
             showConfirmationModal('Une erreur est survenue lors de la réservation. Veuillez réessayer.', 'error');
         }
     };
+
+    createIcons({ icons });
 }
 
 function generateTablesList(tables) {

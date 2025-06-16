@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELORESTAU - Compte Rendu</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/compte-rendu.css" />
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <nav class="navbar">
+        <h1 class="logo"><i data-lucide="map-pin"></i> VELORESTAU Nancy</h1>
+        <ul class="nav-links">
+            <li><a href="index.html"><i data-lucide="home"></i> Accueil</a></li>
+            <li><a href="compte-rendu.html"><i data-lucide="file-text"></i> Compte Rendu</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <main class="content-container">
+            <section class="compte-rendu">
+                <h1>Compte Rendu du Projet VELORESTAU</h1>
+                
+                <article class="section">
+                    <h2><i data-lucide="info"></i> Présentation du Projet</h2>
+                    <p>VELORESTAU est une application web permettant de visualiser les stations de vélos et les restaurants à Nancy. Cette application a été développée dans le cadre du projet SAE.</p>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="git-branch"></i> Architecture du Projet</h2>
+                    <h3>Technologies Employées</h3>
+                    <ul>
+                        <li><strong>Frontend :</strong> HTML5, CSS3, JavaScript</li>
+                        <li><strong>Cartographie :</strong> Leaflet.js</li>
+                        <li><strong>Backend :</strong> Java</li>
+                        <li><strong>Services :</strong> RMI, HttpServer (Proxy)</li>
+                        <li><strong>Base de données :</strong> Oracle (Charlemagne)</li>
+                        <li><strong>Gestion des dépendances :</strong> Maven</li>
+                        <li><strong>Hébergement :</strong> Webetu</li>
+                    </ul>
+
+                    <h3>Schéma d'Architecture</h3>
+                    <div class="diagram">
+                        <img src="images/architecture.png" alt="Schéma d'architecture" style="width: 100%;">
+                    </div>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="check-circle"></i> Réalisations</h2>
+                    <h3>Services Implémentés</h3>
+                    <ul>
+                        <li>Service RMI pour la gestion des restaurants
+                            <ul>
+                                <li>Inscription au service central</li>
+                                <li>Récupération des coordonnées des restaurants</li>
+                                <li>Système de réservation de tables</li>
+                            </ul>
+                        </li>
+                        <li>Service de données ouvertes
+                            <ul>
+                                <li>Récupération des données des stations vélibs</li>
+                                <li>Affichage des disponibilités en temps réel</li>
+                            </ul>
+                        </li>
+                        <li>Proxy HttpServer
+                            <ul>
+                                <li>Gestion des données bloquées</li>
+                                <li>Accès aux incidents de circulation</li>
+                                <li>Intégration avec le service RMI</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3>Aspects Techniques</h3>
+                    <ul>
+                        <li>Gestion des dépendances avec Maven</li>
+                        <li>Compilation automatique</li>
+                        <li>Documentation Javadoc de l'API publique</li>
+                        <li>Gestion des erreurs réseau et des timeouts</li>
+                        <li>Configuration du proxy IUT</li>
+                    </ul>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="book-open"></i> Guide d'Utilisation</h2>
+                    <h3>Prérequis</h3>
+                    <ul>
+                        <li>Java 8 ou supérieur</li>
+                        <li>Maven</li>
+                        <li>Oracle Database (sur Charlemagne)</li>
+                        <li>Un navigateur web moderne</li>
+                    </ul>
+
+                    <h3>Installation et Déploiement</h3>
+                    <div class="code-block">
+                        # Cloner le repository<br>
+                        git clone https://github.com/ItsCyp/SAE-VELORESTAU.git<br>
+                        cd SAE-VELORESTAU<br><br>
+                        # Compiler le projet<br>
+                        mvn clean install<br><br>
+                        # Déployer sur webetu<br>
+                        # Le site web doit être placé dans le répertoire www de webetu<br><br>
+                        # Lancer les services<br>
+                        # Les services doivent être lancés sur différentes machines de la salle
+                    </div>
+
+                    <h3>Configuration</h3>
+                    <ul>
+                        <li>Configuration du proxy IUT pour l'accès externe</li>
+                        <li>Paramètres de connexion à la base de données Oracle</li>
+                        <li>Configuration des services RMI</li>
+                    </ul>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="github"></i> Code Source</h2>
+                    <p>Le code source complet du projet est disponible sur GitHub :</p>
+                    <a href="https://github.com/ItsCyp/SAE-VELORESTAU" class="btn" target="_blank">
+                        <i data-lucide="github"></i> Accéder au Repository
+                    </a>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="alert-triangle"></i> Difficultés Rencontrées</h2>
+                    <ul>
+                        <li>Gestion des différences de versions Java entre les machines</li>
+                        <li>Configuration du proxy pour l'accès aux données externes</li>
+                        <li>Gestion des timeouts et des erreurs réseau</li>
+                        <li>Déploiement sur les différentes machines de la salle</li>
+                        <li>Compatibilité avec Oracle sur Charlemagne</li>
+                    </ul>
+                </article>
+
+                <article class="section">
+                    <h2><i data-lucide="lightbulb"></i> Améliorations Futures</h2>
+                    <ul>
+                        <li>Migration vers MariaDB pour une meilleure compatibilité</li>
+                        <li>Optimisation des performances des services RMI</li>
+                        <li>Amélioration de la gestion des erreurs réseau</li>
+                        <li>Ajout de tests automatisés</li>
+                        <li>Mise en place d'un système de monitoring des services</li>
+                    </ul>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Initialisation des icônes Lucide
+        lucide.createIcons();
+    </script>
+</body>
+</html> 

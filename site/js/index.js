@@ -9621,7 +9621,7 @@
     "config/config.json"(exports, module) {
       module.exports = {
         server: {
-          ip: "100.64.80.78",
+          ip: "127.0.0.1",
           port: "8008"
         },
         weather: {
@@ -26883,10 +26883,10 @@
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>
                     <p><strong>T\xE9l\xE9phone:</strong> ${restaurant.phone}</p>
-                    <button id="reserve-btn"><i data-lucide="calendar"></i> R\xE9server</button>
+                    <button class="reserve-btn"><i data-lucide="calendar"></i> R\xE9server</button>
                 </div>
             `;
-          document.querySelector("#reserve-btn").addEventListener("click", () => {
+          document.querySelector(".reserve-btn").addEventListener("click", () => {
             reserveRestaurant(restaurant.id);
           });
           createIcons({ icons: iconsAndAliases_exports });
@@ -27024,7 +27024,6 @@
           time,
           timestamp: (/* @__PURE__ */ new Date()).toISOString()
         };
-        console.log(reservationData);
         const response = yield fetch(`${config_default.API_RESERVATION}`, {
           method: "POST",
           headers: {
@@ -27048,6 +27047,7 @@
         showConfirmationModal("Une erreur est survenue lors de la r\xE9servation. Veuillez r\xE9essayer.", "error");
       }
     });
+    createIcons({ icons: iconsAndAliases_exports });
   }
   function generateTablesList(tables) {
     let tablesHtml = "";
@@ -27234,7 +27234,7 @@
   document.getElementById("btn-center").addEventListener("click", () => {
     myMap.setView([lat, lon], 14);
   });
-  document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("load", () => {
     createIcons({ icons: iconsAndAliases_exports });
   });
 })();
