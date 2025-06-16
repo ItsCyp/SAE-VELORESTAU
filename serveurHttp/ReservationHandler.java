@@ -49,19 +49,27 @@ class ReservationHandler implements HttpHandler {
             String requestData = scanner.hasNext() ? scanner.next() : "";
             System.out.println("[ReservationHandler] Corps de la requête : " + requestData);
 
-            // Extraire les données nécessaires (approche simple)
+            // Extraire les données nécessaires
             int restaurantId = extractIntValue(requestData, "restaurantId");
             int tableId = extractIntValue(requestData, "tableId");
-            int guests = extractIntValue(requestData, "guests");
-            System.out.println("[ReservationHandler] restaurantId=" + restaurantId + ", guests=" + guests);
+            int partySize = extractIntValue(requestData, "party_size");
+            String firstName = extractStringValue(requestData, "first_name");
+            String lastName = extractStringValue(requestData, "last_name");
+            String phone = extractStringValue(requestData, "phone");
+            String date = extractStringValue(requestData, "date");
+            String time = extractStringValue(requestData, "time");
             
-            // Pour l'instant, on utilise des valeurs par défaut pour firstName, lastName et phone
-            String firstName = "Client";
-            String lastName = "Temporaire";
-            String phone = "0000000000";
-
+            System.out.println("[ReservationHandler] Données extraites : restaurantId=" + restaurantId + 
+                             ", tableId=" + tableId + 
+                             ", partySize=" + partySize + 
+                             ", firstName=" + firstName + 
+                             ", lastName=" + lastName + 
+                             ", phone=" + phone + 
+                             ", date=" + date + 
+                             ", time=" + time);
+            
             // Appeler le service de réservation
-            String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, guests);
+            String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, partySize, date, time);
             System.out.println("[ReservationHandler] Réponse du serviceDb : " + response);
             
             // Vérifier si la réservation a réussi
@@ -93,6 +101,16 @@ class ReservationHandler implements HttpHandler {
         java.util.regex.Matcher m = r.matcher(json);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
+        }
+        throw new IllegalArgumentException("Clé non trouvée: " + key);
+    }
+
+    private String extractStringValue(String json, String key) {
+        String pattern = "\"" + key + "\":\\s*\"([^\"]+)\"";
+        java.util.regex.Pattern r = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher m = r.matcher(json);
+        if (m.find()) {
+            return m.group(1);
         }
         throw new IllegalArgumentException("Clé non trouvée: " + key);
     }

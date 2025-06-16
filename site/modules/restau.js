@@ -110,15 +110,27 @@ function showReservationModal(restaurantId) {
                 <div class="reservation-form">
                     <h3>Détails de la réservation</h3>
                     <div class="form-group">
-                        <label for="date">Date:</label>
+                        <label for="first_name">Prénom :</label>
+                        <input type="text" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Nom :</label>
+                        <input type="text" id="last_name" name="last_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Téléphone :</label>
+                        <input type="tel" id="phone" name="phone" required pattern="[0-9+ ]{6,20}">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date :</label>
                         <input type="date" id="date" required>
                     </div>
                     <div class="form-group">
-                        <label for="time">Heure:</label>
+                        <label for="time">Heure :</label>
                         <input type="time" id="time" required>
                     </div>
                     <div class="form-group">
-                        <label for="guests">Nombre de personnes:</label>
+                        <label for="guests">Nombre de personnes :</label>
                         <input type="number" id="guests" min="1" value="1" required>
                     </div>
                     <button type="submit" class="submit-reservation">Confirmer la réservation</button>
@@ -168,6 +180,9 @@ function showReservationModal(restaurantId) {
         const time = form.querySelector('#time').value;
         const guests = parseInt(form.querySelector('#guests').value);
         const selectedTableInput = form.querySelector('input[name="table"]:checked');
+        const firstName = form.querySelector('#first_name').value;
+        const lastName = form.querySelector('#last_name').value;
+        const phone = form.querySelector('#phone').value;
         
         if (!selectedTableInput) {
             showConfirmationModal('Veuillez sélectionner une table', 'error');
@@ -188,9 +203,12 @@ function showReservationModal(restaurantId) {
             const reservationData = {
                 restaurantId: restaurantId,
                 tableId: parseInt(selectedTable),
+                first_name: firstName,
+                last_name: lastName,
+                phone: phone,
+                party_size: guests,
                 date: date,
                 time: time,
-                guests: guests,
                 timestamp: new Date().toISOString()
             };
 

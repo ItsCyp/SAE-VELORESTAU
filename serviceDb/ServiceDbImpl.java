@@ -70,21 +70,42 @@ public class ServiceDbImpl implements ServiceDb {
     }
 
     @Override
-    public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize) throws RemoteException {
+    public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize, String reservationDate, String reservationTime) throws RemoteException {
         System.out.println("reserve");
         JSONObject result = new JSONObject();
-        try (Connection conn = dbManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO reservations(restaurant_id,table_id,first_name,last_name,phone,party_size) VALUES(?,?,?,?,?,?)")) {
-            ps.setInt(1, restaurantId);
-            ps.setInt(2, tableId);
-            ps.setString(3, firstName);
-            ps.setString(4, lastName);
-            ps.setString(5, phone);
-            ps.setInt(6, partySize);
-            ps.executeUpdate();
-            result.put("status", "ok");
-            System.out.println("ok");
+        
+        try (Connection conn = dbManager.getConnection()) {
+            // Vérifier si la table est déjà réservée
+            try (PreparedStatement checkPs = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_date = ? AND reservation_time = ?")) {
+                checkPs.setInt(1, restaurantId);
+                checkPs.setInt(2, tableId);
+                checkPs.setString(3, reservationDate);
+                checkPs.setString(4, reservationTime);
+                
+                ResultSet rs = checkPs.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    result.put("status", "error");
+                    result.put("message", "Cette table est déjà réservée pour cette date et heure");
+                    return result.toString();
+                }
+            }
+
+            // Si la table est disponible, procéder à la réservation
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_date, reservation_time) VALUES(?,?,?,?,?,?,?,?)")) {
+                ps.setInt(1, restaurantId);
+                ps.setInt(2, tableId);
+                ps.setString(3, firstName);
+                ps.setString(4, lastName);
+                ps.setString(5, phone);
+                ps.setInt(6, partySize);
+                ps.setString(7, reservationDate);
+                ps.setString(8, reservationTime);
+                ps.executeUpdate();
+                result.put("status", "ok");
+                System.out.println("ok");
+            }
         } catch (SQLException e) {
             result.put("status", "error");
             result.put("message", e.getMessage());
