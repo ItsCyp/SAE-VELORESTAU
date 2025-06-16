@@ -20,6 +20,7 @@ public class ServeurHttpImpl implements ServeurHttp {
 
     private final HttpsServer server;
     private ServiceHttp servicesHttp;
+    private ServiceDb servicesDb;
     HashMap<String, String> conf;
 
     // private ArrayList<ServiceBd> servicesBd;
@@ -78,10 +79,20 @@ public class ServeurHttpImpl implements ServeurHttp {
 
     @Override
     public void enregistrerServiceHttp(ServiceHttp serv) throws RemoteException {
+        System.out.println("enregistrement du service http");
         if (this.servicesHttp == null) {
             servicesHttp = serv;
             server.createContext("/api/meteo", new ApiHandler(serv, conf.get("meteo")));
             server.createContext("/api/accidents", new ApiHandler(serv, conf.get("accidents")));
+        }
+    }
+
+    @Override
+    public void enregistrerServiceDb(ServiceDb serv) throws RemoteException {
+        System.out.println("enregistrement du service db");
+        if (this.servicesDb == null) {
+            servicesDb = serv;
+            server.createContext("/api/restaurants", new RestaurantHandler(serv));
         }
     }
 

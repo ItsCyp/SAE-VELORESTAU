@@ -8,11 +8,10 @@ import java.sql.SQLException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ServiceDbImpl extends UnicastRemoteObject implements ServiceDb {
+public class ServiceDbImpl implements ServiceDb {
     private final DatabaseManager dbManager;
 
-    protected ServiceDbImpl() throws RemoteException {
-        super();
+    protected ServiceDbImpl() {
         this.dbManager = new DatabaseManager();
     }
 

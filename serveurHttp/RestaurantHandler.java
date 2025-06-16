@@ -1,0 +1,44 @@
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+class RestaurantHandler implements HttpHandler {
+
+    private final ServiceDb serviceDb;
+
+    public RestaurantHandler(ServiceDb service) {
+        this.serviceDb = service;
+    }
+
+    public void handle(HttpExchange t) throws IOException {
+        System.out.println(t.getRemoteAddress().getAddress().toString() + " s'est connecté");
+        t.getResponseHeaders().add("Access-Control-Allow-Origin", t.getRequestHeaders().getFirst("Origin"));
+        t.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+        t.getResponseHeaders().add("Content-Type", "application/json");
+        
+        try {
+            String response = this.serviceDb.getRestaurants();
+            if (response != null) {
+                t.sendResponseHeaders(200, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } else {
+                // Si pas de restaurants, on renvoie un tableau vide
+                String emptyResponse = "[]";
+                t.sendResponseHeaders(200, emptyResponse.length());
+                OutputStream os = t.getResponseBody();
+                os.write(emptyResponse.getBytes());
+                os.close();
+            }
+        } catch (Exception e) {
+            String errorResponse = "{\"error\": \"Une erreur est survenue lors de la récupération des restaurants\"}";
+            t.sendResponseHeaders(500, errorResponse.length());
+            OutputStream os = t.getResponseBody();
+            os.write(errorResponse.getBytes());
+            os.close();
+        }
+    }
+} 

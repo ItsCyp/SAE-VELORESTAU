@@ -7,6 +7,7 @@ let restauMarkers = L.layerGroup();
 async function fetchRestaurants(){
     const response = await fetch(config.API_RESTAU);
     const data = await response.json();
+    console.log(data);
     return data;
 }
 

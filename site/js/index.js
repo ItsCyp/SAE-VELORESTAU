@@ -9664,7 +9664,7 @@
   var API_VELIBS_STATIONS = config.API_VELIBS.address_stations;
   var API_VELIBS_STATUS = config.API_VELIBS.address_status;
   var API_INCIDENTS = `https://${SERVER_IP}:${SERVER_PORT}/api/accidents`;
-  var API_RESTAU = `https://${SERVER_IP}:${SERVER_PORT}/api/restau`;
+  var API_RESTAU = `https://${SERVER_IP}:${SERVER_PORT}/api/restaurants`;
   var WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${config.weather.nancy_lat}&lon=${config.weather.nancy_lon}&appid=${config.weather.api_key}&units=metric`;
   var config_default = {
     API_VELIBS_STATIONS,
@@ -26855,6 +26855,7 @@
     return __async(this, null, function* () {
       const response = yield fetch(config_default.API_RESTAU);
       const data = yield response.json();
+      console.log(data);
       return data;
     });
   }
@@ -26935,14 +26936,50 @@
       }
     };
     const form = modal.querySelector("#reservation-form");
-    form.onsubmit = (e) => {
+    form.onsubmit = (e) => __async(null, null, function* () {
+      var _a;
       e.preventDefault();
       const date = form.querySelector("#date").value;
       const time = form.querySelector("#time").value;
       const guests = form.querySelector("#guests").value;
-      alert(`R\xE9servation confirm\xE9e pour le ${date} \xE0 ${time} pour ${guests} personnes`);
-      modal.remove();
-    };
+      const selectedTable = (_a = form.querySelector('input[name="table"]:checked')) == null ? void 0 : _a.value;
+      if (!selectedTable) {
+        alert("Veuillez s\xE9lectionner une table");
+        return;
+      }
+      try {
+        const reservationData = {
+          restaurantId,
+          tableId: selectedTable,
+          date,
+          time,
+          guests: parseInt(guests),
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+          // Pour la gestion des conflits
+        };
+        const response = yield fetch(`${config_default.API_RESTAU}/reservations`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(reservationData)
+        });
+        if (!response.ok) {
+          const error = yield response.json();
+          if (error.code === "CONFLICT") {
+            alert("Cette table a d\xE9j\xE0 \xE9t\xE9 r\xE9serv\xE9e. Veuillez en s\xE9lectionner une autre.");
+            return;
+          }
+          throw new Error("Erreur lors de la r\xE9servation");
+        }
+        const result = yield response.json();
+        alert(`R\xE9servation confirm\xE9e pour le ${date} \xE0 ${time} pour ${guests} personnes`);
+        modal.remove();
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur est survenue lors de la r\xE9servation. Veuillez r\xE9essayer.");
+      }
+    });
   }
   function generateTablesList() {
     let tablesHtml = "";

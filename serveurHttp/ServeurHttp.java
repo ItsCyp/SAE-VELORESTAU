@@ -5,6 +5,6 @@ public interface ServeurHttp extends Remote {
 
     void enregistrerServiceHttp(ServiceHttp serv) throws RemoteException;
 
-    // void enregistrerServiceBd(ServiceBd serv)
+    void enregistrerServiceDb(ServiceDb serv) throws RemoteException;
 
 }
