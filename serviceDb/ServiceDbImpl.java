@@ -4,12 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ServiceDbImpl implements ServiceDb {
     private final DatabaseManager dbManager;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     protected ServiceDbImpl() {
         this.dbManager = new DatabaseManager();
@@ -74,36 +78,45 @@ public class ServiceDbImpl implements ServiceDb {
         System.out.println("reserve");
         JSONObject result = new JSONObject();
         
-        try (Connection conn = dbManager.getConnection()) {
-            // Vérifier si la table est déjà réservée
-            try (PreparedStatement checkPs = conn.prepareStatement(
-                    "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_time = ?")) {
-                checkPs.setInt(1, restaurantId);
-                checkPs.setInt(2, tableId);
-                checkPs.setString(3, reservationTime);
-                
-                ResultSet rs = checkPs.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    result.put("status", "error");
-                    result.put("message", "Cette table est déjà réservée pour cette date et heure");
-                    return result.toString();
+        try {
+            // Valider le format de la date
+            Date parsedDate = dateFormat.parse(reservationTime);
+            String formattedDateTime = dateFormat.format(parsedDate);
+            
+            try (Connection conn = dbManager.getConnection()) {
+                // Vérifier si la table est déjà réservée
+                try (PreparedStatement checkPs = conn.prepareStatement(
+                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_time = ?")) {
+                    checkPs.setInt(1, restaurantId);
+                    checkPs.setInt(2, tableId);
+                    checkPs.setString(3, formattedDateTime);
+                    
+                    ResultSet rs = checkPs.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        result.put("status", "error");
+                        result.put("message", "Cette table est déjà réservée pour cette date et heure");
+                        return result.toString();
+                    }
+                }
+
+                // Si la table est disponible, procéder à la réservation
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_time) VALUES(?,?,?,?,?,?,?)")) {
+                    ps.setInt(1, restaurantId);
+                    ps.setInt(2, tableId);
+                    ps.setString(3, firstName);
+                    ps.setString(4, lastName);
+                    ps.setString(5, phone);
+                    ps.setInt(6, partySize);
+                    ps.setString(7, formattedDateTime);
+                    ps.executeUpdate();
+                    result.put("status", "ok");
+                    System.out.println("ok");
                 }
             }
-
-            // Si la table est disponible, procéder à la réservation
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_time) VALUES(?,?,?,?,?,?,?)")) {
-                ps.setInt(1, restaurantId);
-                ps.setInt(2, tableId);
-                ps.setString(3, firstName);
-                ps.setString(4, lastName);
-                ps.setString(5, phone);
-                ps.setInt(6, partySize);
-                ps.setString(7, reservationTime);
-                ps.executeUpdate();
-                result.put("status", "ok");
-                System.out.println("ok");
-            }
+        } catch (ParseException e) {
+            result.put("status", "error");
+            result.put("message", "Format de date invalide. Utilisez le format YYYY-MM-DD HH:mm (ex: 2024-03-20 19:30)");
         } catch (SQLException e) {
             result.put("status", "error");
             result.put("message", e.getMessage());
