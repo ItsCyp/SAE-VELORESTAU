@@ -83,7 +83,7 @@ public class ServiceDbImpl implements ServiceDb {
             try (Connection conn = dbManager.getConnection()) {
                 // Vérifier si la table est déjà réservée
                 try (PreparedStatement checkPs = conn.prepareStatement(
-                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_date = to_date(?, 'YYYY-MM-DD HH24:MI:SS')")) {
+                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_date = TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS')")) {
                     checkPs.setInt(1, restaurantId);
                     checkPs.setInt(2, tableId);
                     checkPs.setString(3, reservationDate);
@@ -98,7 +98,7 @@ public class ServiceDbImpl implements ServiceDb {
 
                 // Si la table est disponible, procéder à la réservation
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_date) VALUES(?,?,?,?,?,?,to_date(?, 'YYYY-MM-DD HH:mm'))")) {
+                        "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_date) VALUES(?,?,?,?,?,?,TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS'))")) {
                     ps.setInt(1, restaurantId);
                     ps.setInt(2, tableId);
                     ps.setString(3, firstName);
