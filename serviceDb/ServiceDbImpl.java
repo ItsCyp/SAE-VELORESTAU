@@ -76,13 +76,15 @@ public class ServiceDbImpl implements ServiceDb {
     @Override
     public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize, String reservationTime) throws RemoteException {
         System.out.println("reserve");
+        System.out.println("Date reçue: " + reservationTime);
         JSONObject result = new JSONObject();
         
         try {
             // Valider le format de la date
+            System.out.println("Tentative de parsing de la date...");
             Date parsedDate = dateFormat.parse(reservationTime);
             String formattedDateTime = dateFormat.format(parsedDate);
-            System.out.println(formattedDateTime);
+            System.out.println("Date parsée avec succès: " + formattedDateTime);
             
             try (Connection conn = dbManager.getConnection()) {
                 // Vérifier si la table est déjà réservée
