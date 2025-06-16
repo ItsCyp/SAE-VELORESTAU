@@ -1,4 +1,4 @@
-#!/bin/bash
+1#!/bin/bash
 # Script d'installation à distance pour construire et démarrer l'application
 # Usage: remote_setup.sh [registry-host]
 
@@ -8,7 +8,7 @@ REGISTRY_HOST=${1:-localhost}
 # Compiler les composants Java
 if [ -d serviceDb ]; then
     echo "Compiling serviceDb..."
-    (cd serviceDb && javac -classpath "lib/*:." *.java)
+    (cd serviceDb && javac -cp ".:lib/*" *.java)
 fi
 
 if [ -d serviceHttp ]; then
@@ -29,7 +29,7 @@ fi
 
 if [ -d serviceDb ]; then
     echo "Starting ServiceDb..."
-    (cd serviceDb && nohup java Main "$REGISTRY_HOST" >/tmp/serviceDb.log 2>&1 &)
+    (cd serviceDb && nohup java -cp ".:lib/*" Main "$REGISTRY_HOST" >/tmp/serviceDb.log 2>&1 &)
 fi
 
 echo "Remote setup complete on $(hostname)"
