@@ -70,17 +70,18 @@ public class ServiceDbImpl implements ServiceDb {
     }
 
     @Override
-    public String reserve(int restaurantId, String firstName, String lastName, String phone, int partySize) throws RemoteException {
+    public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize) throws RemoteException {
         System.out.println("reserve");
         JSONObject result = new JSONObject();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO reservations(restaurant_id,first_name,last_name,phone,party_size) VALUES(?,?,?,?,?)")) {
+                     "INSERT INTO reservations(restaurant_id,table_id,first_name,last_name,phone,party_size) VALUES(?,?,?,?,?,?)")) {
             ps.setInt(1, restaurantId);
-            ps.setString(2, firstName);
-            ps.setString(3, lastName);
-            ps.setString(4, phone);
-            ps.setInt(5, partySize);
+            ps.setInt(2, tableId);
+            ps.setString(3, firstName);
+            ps.setString(4, lastName);
+            ps.setString(5, phone);
+            ps.setInt(6, partySize);
             ps.executeUpdate();
             result.put("status", "ok");
             System.out.println("ok");

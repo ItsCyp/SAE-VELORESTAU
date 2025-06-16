@@ -51,6 +51,7 @@ class ReservationHandler implements HttpHandler {
 
             // Extraire les données nécessaires (approche simple)
             int restaurantId = extractIntValue(requestData, "restaurantId");
+            int tableId = extractIntValue(requestData, "tableId");
             int guests = extractIntValue(requestData, "guests");
             System.out.println("[ReservationHandler] restaurantId=" + restaurantId + ", guests=" + guests);
             
@@ -60,7 +61,7 @@ class ReservationHandler implements HttpHandler {
             String phone = "0000000000";
 
             // Appeler le service de réservation
-            String response = this.serviceDb.reserve(restaurantId, firstName, lastName, phone, guests);
+            String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, guests);
             System.out.println("[ReservationHandler] Réponse du serviceDb : " + response);
             
             // Vérifier si la réservation a réussi
