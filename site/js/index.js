@@ -26877,7 +26877,7 @@
         marker.on("click", () => {
           const reservationsSection = document.querySelector("section#restaurants");
           reservationsSection.innerHTML = `
-                <h2><i data-lucide="coffee"></i> Restaurant s\xE9lectionn\xE9</h2>
+                <h2><i data-lucide="utensils-crossed"></i> Restaurant s\xE9lectionn\xE9</h2>
                 <div class="restaurant-details">
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>

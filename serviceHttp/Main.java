@@ -16,7 +16,7 @@ public class Main {
         ServiceHttpImpl http = new ServiceHttpImpl(args[1]);
 
         Registry registry = LocateRegistry.getRegistry(args[0]);
-        System.out.println("reg : " + String.valueOf(registry));
+        System.out.println("[ServiceHttp] Connecté au registry à l'adresse: " + args[0]);
         ServeurHttp serveur = (ServeurHttp) registry.lookup("serveur_api");
 
         ServiceHttp service = (ServiceHttp) UnicastRemoteObject.exportObject(http, 0);

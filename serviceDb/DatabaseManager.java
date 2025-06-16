@@ -12,7 +12,6 @@ public class DatabaseManager {
         try {
             // Charger le driver Oracle
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            System.out.println("Oracle JDBC Driver loaded successfully.");
             
             // Charger la configuration depuis le fichier
             loadConfiguration(confFile);

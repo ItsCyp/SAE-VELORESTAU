@@ -32,7 +32,7 @@ async function createMarker(map){
             // Mettre à jour la section des réservations
             const reservationsSection = document.querySelector('section#restaurants');
             reservationsSection.innerHTML = `
-                <h2><i data-lucide="coffee"></i> Restaurant sélectionné</h2>
+                <h2><i data-lucide="utensils-crossed"></i> Restaurant sélectionné</h2>
                 <div class="restaurant-details">
                     <h3>${restaurant.name}</h3>
                     <p><strong>Adresse:</strong> ${restaurant.address}</p>

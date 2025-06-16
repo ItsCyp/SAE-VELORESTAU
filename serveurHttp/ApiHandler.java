@@ -15,7 +15,7 @@ class ApiHandler implements HttpHandler {
     }
 
     public void handle(HttpExchange t) throws IOException {
-        System.out.println(t.getRemoteAddress().getAddress().toString() + " s'est connecté");
+        System.out.println("[ApiHandler] Requête reçue : " + t.getRequestMethod() + " de " + t.getRemoteAddress().getAddress().toString());
         t.getResponseHeaders().add("Access-Control-Allow-Origin", t.getRequestHeaders().getFirst("Origin"));
         t.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
         DataTransfer response = this.serviceHttp.fetchAPI(apiUrl);

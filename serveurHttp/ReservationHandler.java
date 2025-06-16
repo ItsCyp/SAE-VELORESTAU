@@ -43,8 +43,10 @@ class ReservationHandler implements HttpHandler {
         try {
             // Lire le corps de la requête
             InputStream requestBody = t.getRequestBody();
-            Scanner scanner = new Scanner(requestBody).useDelimiter("\\A");
-            String requestData = scanner.hasNext() ? scanner.next() : "";
+            String requestData;
+            try (Scanner scanner = new Scanner(requestBody).useDelimiter("\\A")) {
+                requestData = scanner.hasNext() ? scanner.next() : "";
+            }
 
             // Extraire les données nécessaires
             int restaurantId = extractIntValue(requestData, "restaurantId");

@@ -25,7 +25,6 @@ public class ServiceHttpImpl implements ServiceHttp {
         }
 
         if(this.conf.containsKey("proxy-address")){
-            System.out.println("faut passer par là, non mais !");
             this.init(conf.get("proxy-address"), Integer.parseInt(conf.get("proxy-port")));
         } else {
             this.init();
