@@ -104,15 +104,54 @@ function showReservationModal(restaurantId) {
 
     // Gérer la soumission du formulaire
     const form = modal.querySelector('#reservation-form');
-    form.onsubmit = (e) => {
+    form.onsubmit = async (e) => {
         e.preventDefault();
         const date = form.querySelector('#date').value;
         const time = form.querySelector('#time').value;
         const guests = form.querySelector('#guests').value;
-        
-        // Ici, vous pouvez ajouter la logique pour sauvegarder la réservation
-        alert(`Réservation confirmée pour le ${date} à ${time} pour ${guests} personnes`);
-        modal.remove();
+        const selectedTable = form.querySelector('input[name="table"]:checked')?.value;
+
+        if (!selectedTable) {
+            alert('Veuillez sélectionner une table');
+            return;
+        }
+
+        try {
+            // Créer l'objet de réservation
+            const reservationData = {
+                restaurantId: restaurantId,
+                tableId: selectedTable,
+                date: date,
+                time: time,
+                guests: parseInt(guests),
+                timestamp: new Date().toISOString() // Pour la gestion des conflits
+            };
+
+            // Envoyer la réservation au serveur
+            const response = await fetch(`${config.API_RESTAU}/reservations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reservationData)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                if (error.code === 'CONFLICT') {
+                    alert('Cette table a déjà été réservée. Veuillez en sélectionner une autre.');
+                    return;
+                }
+                throw new Error('Erreur lors de la réservation');
+            }
+
+            const result = await response.json();
+            alert(`Réservation confirmée pour le ${date} à ${time} pour ${guests} personnes`);
+            modal.remove();
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Une erreur est survenue lors de la réservation. Veuillez réessayer.');
+        }
     };
 }
 
