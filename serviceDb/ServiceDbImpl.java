@@ -1,26 +1,22 @@
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class ServiceDbImpl implements ServiceDb {
     private final DatabaseManager dbManager;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    protected ServiceDbImpl() {
-        this.dbManager = new DatabaseManager();
+    protected ServiceDbImpl(String confFile) {
+        this.dbManager = new DatabaseManager(confFile);
     }
 
     @Override
     public String getRestaurants() throws RemoteException {
+        System.out.println("[ServiceDb] Récupération des restaurants");
         JSONArray array = new JSONArray();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(
@@ -75,8 +71,7 @@ public class ServiceDbImpl implements ServiceDb {
 
     @Override
     public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize, String reservationDate) throws RemoteException {
-        System.out.println("reserve");
-        System.out.println("Date reçue: " + reservationDate);
+        System.out.println("[ServiceDb] Réservation pour le restaurant " + restaurantId + " et la table " + tableId);
         JSONObject result = new JSONObject();
         
         try {
@@ -121,7 +116,6 @@ public class ServiceDbImpl implements ServiceDb {
             result.put("status", "error");
             result.put("message", e.getMessage());
         }
-        System.out.println(result.toString());
         return result.toString();
     }
 }

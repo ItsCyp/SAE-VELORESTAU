@@ -26,14 +26,12 @@ class ReservationHandler implements HttpHandler {
 
         // Gestion de la requête OPTIONS (preflight)
         if (t.getRequestMethod().equals("OPTIONS")) {
-            System.out.println("[ReservationHandler] Requête OPTIONS reçue, envoi des headers CORS");
             t.sendResponseHeaders(200, -1);
             t.close();
             return;
         }
 
         if (!t.getRequestMethod().equals("POST")) {
-            System.out.println("[ReservationHandler] Méthode non autorisée : " + t.getRequestMethod());
             String response = "{\"error\": \"Méthode non autorisée\"}";
             t.sendResponseHeaders(405, response.length());
             OutputStream os = t.getResponseBody();
@@ -47,7 +45,6 @@ class ReservationHandler implements HttpHandler {
             InputStream requestBody = t.getRequestBody();
             Scanner scanner = new Scanner(requestBody).useDelimiter("\\A");
             String requestData = scanner.hasNext() ? scanner.next() : "";
-            System.out.println("[ReservationHandler] Corps de la requête : " + requestData);
 
             // Extraire les données nécessaires
             int restaurantId = extractIntValue(requestData, "restaurantId");
@@ -61,19 +58,9 @@ class ReservationHandler implements HttpHandler {
             
             // Combiner date et time pour créer reservationTime au format YYYY-MM-DD HH:mm
             String reservationTime = date + " " + time;
-            System.out.println("[ReservationHandler] reservationTime=" + reservationTime);
-            
-            System.out.println("[ReservationHandler] Données extraites : restaurantId=" + restaurantId + 
-                             ", tableId=" + tableId + 
-                             ", partySize=" + partySize + 
-                             ", firstName=" + firstName + 
-                             ", lastName=" + lastName + 
-                             ", phone=" + phone + 
-                             ", reservationTime=" + reservationTime);
             
             // Appeler le service de réservation
             String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, partySize, reservationTime);
-            System.out.println("[ReservationHandler] Réponse du serviceDb : " + response);
             
             // Vérifier si la réservation a réussi
             if (response.contains("\"status\":\"ok\"")) {

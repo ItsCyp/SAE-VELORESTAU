@@ -1,21 +1,39 @@
 import java.sql.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:oracle:thin:@charlemagne.iutnc.univ-lorraine.fr:1521:infodb";
-    private static final String DB_USER = "e0617u";
-    private static final String DB_PASSWORD = "1234abcd&";
+    private String dbUrl;
+    private String dbUser;
+    private String dbPassword;
 
-    public DatabaseManager() {
+    public DatabaseManager(String confFile) {
         try {
+            // Charger le driver Oracle
             Class.forName("oracle.jdbc.driver.OracleDriver");
             System.out.println("Oracle JDBC Driver loaded successfully.");
-            // Pas d'init ici, juste charger le driver
+            
+            // Charger la configuration depuis le fichier
+            loadConfiguration(confFile);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Oracle JDBC Driver not found. Please add it to your classpath.", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading configuration file.", e);
+        }
+    }
+
+    private void loadConfiguration(String confFile) throws IOException {
+        Properties properties = new Properties();
+        try (FileInputStream fis = new FileInputStream(confFile)) {
+            properties.load(fis);
+            dbUrl = properties.getProperty("db_url");
+            dbUser = properties.getProperty("db_user");
+            dbPassword = properties.getProperty("db_password");
         }
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 }

@@ -1,6 +1,6 @@
 public class TestDbConnection {
     public static void main(String[] args) {
-        DatabaseManager manager = new DatabaseManager();
+        DatabaseManager manager = new DatabaseManager(args[0]);
         try (java.sql.Connection conn = manager.getConnection()) {
             System.out.println("Database connection OK: " + (conn != null));
             System.out.println("Connected as: " + conn.getMetaData().getUserName());
@@ -12,7 +12,7 @@ public class TestDbConnection {
 
         try {
             System.out.println("Retrieving restaurants from Oracle database...");
-            ServiceDb service = new ServiceDbImpl();
+            ServiceDb service = new ServiceDbImpl(args[0]);
             String json = service.getRestaurants();
             org.json.JSONArray arr = new org.json.JSONArray(json);
             System.out.println("Retrieved " + arr.length() + " restaurants as JSON");

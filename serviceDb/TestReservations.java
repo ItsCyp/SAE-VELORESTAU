@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public class TestReservations {
     public static void main(String[] args) {
-        DatabaseManager manager = new DatabaseManager();
+        DatabaseManager manager = new DatabaseManager(args[0]);
         
         try (Connection conn = manager.getConnection()) {
             System.out.println("Connexion à la base de données établie");

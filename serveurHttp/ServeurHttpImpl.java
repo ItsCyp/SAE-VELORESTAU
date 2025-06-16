@@ -74,12 +74,12 @@ public class ServeurHttpImpl implements ServeurHttp {
         }
 
         server.start();
-        System.out.println("serveur démarré sur le port " + conf.get("port"));
+        System.out.println("[Serveur] Serveur démarré sur le port " + conf.get("port"));
     }
 
     @Override
     public void enregistrerServiceHttp(ServiceHttp serv) throws RemoteException {
-        System.out.println("enregistrement du service http");
+        System.out.println("[Serveur] Enregistrement du service http");
         if (this.servicesHttp == null) {
             servicesHttp = serv;
             server.createContext("/api/meteo", new ApiHandler(serv, conf.get("meteo")));
@@ -89,7 +89,7 @@ public class ServeurHttpImpl implements ServeurHttp {
 
     @Override
     public void enregistrerServiceDb(ServiceDb serv) throws RemoteException {
-        System.out.println("enregistrement du service db");
+        System.out.println("[Serveur] Enregistrement du service db");
         if (this.servicesDb == null) {
             servicesDb = serv;
             server.createContext("/api/restaurants", new RestaurantHandler(serv));

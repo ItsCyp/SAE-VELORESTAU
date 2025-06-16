@@ -3,7 +3,6 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 class ApiHandler implements HttpHandler {
 

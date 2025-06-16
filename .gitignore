@@ -1,0 +1,32 @@
+# Ignorer les fichiers de compilation Java
+*.class
+
+# Ignorer les fichiers temporaires et de log
+*.log
+*.tmp
+
+# Ignorer les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers de configuration d'IDE
+/.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Ignorer les fichiers node_modules (si jamais du JS côté client)
+/node_modules/
+
+# Ignorer les fichiers de build
+/build/
+/dist/
+/out/
+
+# Ignorer les fichiers de sauvegarde
+*~
+
+# Ignorer les fichiers de configuration utilisateur
+*.swp
+*.swo 

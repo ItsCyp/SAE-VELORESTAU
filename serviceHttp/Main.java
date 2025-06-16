@@ -8,6 +8,11 @@ import java.rmi.server.UnicastRemoteObject;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException, NotBoundException {
+
+        if (args.length < 2) {
+            System.err.println("Usage: java Main <host> <confFile>");
+            System.exit(1);
+        }
         ServiceHttpImpl http = new ServiceHttpImpl(args[1]);
 
         Registry registry = LocateRegistry.getRegistry(args[0]);
@@ -17,6 +22,7 @@ public class Main {
         ServiceHttp service = (ServiceHttp) UnicastRemoteObject.exportObject(http, 0);
 
         serveur.enregistrerServiceHttp(service);
+        System.out.println("[ServiceHttp] ServiceHttp en cours...");
 
     }
 

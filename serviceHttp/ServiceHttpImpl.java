@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -11,8 +10,6 @@ import java.net.http.HttpResponse;
 import java.rmi.RemoteException;
 import java.time.Duration;
 import java.util.HashMap;
-
-import javax.xml.crypto.Data;
 
 public class ServiceHttpImpl implements ServiceHttp {
 
@@ -26,7 +23,6 @@ public class ServiceHttpImpl implements ServiceHttp {
         } catch(IOException e){
             e.printStackTrace();
         }
-
 
         if(this.conf.containsKey("proxy-address")){
             System.out.println("faut passer par là, non mais !");
@@ -42,7 +38,7 @@ public class ServiceHttpImpl implements ServiceHttp {
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
-                .proxy(ProxySelector.of(new InetSocketAddress("www-cache.iutnc.univ-lorraine.fr", 3128)))
+                .proxy(ProxySelector.of(new InetSocketAddress(adresseProxy, portProxy)))
                 .build();
     }
 
@@ -55,7 +51,7 @@ public class ServiceHttpImpl implements ServiceHttp {
     }
 
     public DataTransfer fetchAPI(String url) throws RemoteException {
-        System.out.println("ca passe dans fetchAPI");
+        // System.out.println("ca passe dans fetchAPI");
         if (httpClient == null) {
             System.err.println(
                     "∑x3 bip boup, utilisation d'un client par défaut, risque d'erreur dû à l'absence de proxy ");
@@ -74,7 +70,7 @@ public class ServiceHttpImpl implements ServiceHttp {
             System.err.println("∑x3 bip boup, y'a une erreur ");
             e.printStackTrace();
         }
-        System.out.println("ca renvoie le résultat du fecth");
+        // System.out.println("ca renvoie le résultat du fecth");
         return response;
     }
 

@@ -1,6 +1,5 @@
 import L from 'leaflet';
 import config from './config.js';
-import { createIcons, icons } from "lucide";
 
 let incidentMarkers = L.layerGroup();
 

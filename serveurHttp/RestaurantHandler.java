@@ -13,7 +13,7 @@ class RestaurantHandler implements HttpHandler {
     }
 
     public void handle(HttpExchange t) throws IOException {
-        System.out.println(t.getRemoteAddress().getAddress().toString() + " s'est connecté");
+        System.out.println("[RestaurantHandler] Nouvelle requête reçue : " + t.getRequestMethod() + " de " + t.getRemoteAddress().getAddress().toString());
         t.getResponseHeaders().add("Access-Control-Allow-Origin", t.getRequestHeaders().getFirst("Origin"));
         t.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
         t.getResponseHeaders().add("Content-Type", "application/json");
@@ -34,6 +34,8 @@ class RestaurantHandler implements HttpHandler {
                 os.close();
             }
         } catch (Exception e) {
+            System.out.println("[RestaurantHandler] Erreur lors de la récupération des restaurants : " + e.getMessage());
+            e.printStackTrace();
             String errorResponse = "{\"error\": \"Une erreur est survenue lors de la récupération des restaurants\"}";
             t.sendResponseHeaders(500, errorResponse.length());
             OutputStream os = t.getResponseBody();

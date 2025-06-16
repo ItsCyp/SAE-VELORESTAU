@@ -26858,7 +26858,6 @@
     return __async(this, null, function* () {
       const response = yield fetch(config_default.API_RESTAU);
       const data = yield response.json();
-      console.log(data);
       return data;
     });
   }

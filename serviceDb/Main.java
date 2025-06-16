@@ -7,20 +7,20 @@ import java.rmi.NotBoundException;
 public class Main {
     public static void main(String[] args) {
         try {
-            if (args.length < 1) {
-                System.err.println("Usage: java Main <host>");
+            if (args.length < 2) {
+                System.err.println("Usage: java Main <host> <confFile>");
                 System.exit(1);
             }
 
-            ServiceDbImpl service = new ServiceDbImpl();
+            ServiceDbImpl service = new ServiceDbImpl(args[1]);
             Registry registry = LocateRegistry.getRegistry(args[0]);
-            System.out.println("Connected to registry at: " + args[0]);
+            System.out.println("[ServiceDb] Connected to registry at: " + args[0]);
 
             ServeurHttp serveur = (ServeurHttp) registry.lookup("serveur_api");
             ServiceDb serviceDb = (ServiceDb) UnicastRemoteObject.exportObject(service, 0);
 
             serveur.enregistrerServiceDb(serviceDb);
-            System.out.println("ServiceDb registered successfully");
+            System.out.println("[ServiceDb] ServiceDb en cours...");
         } catch (RemoteException e) {
             System.err.println("Remote error: " + e.getMessage());
             e.printStackTrace();
