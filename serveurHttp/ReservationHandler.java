@@ -59,17 +59,19 @@ class ReservationHandler implements HttpHandler {
             String date = extractStringValue(requestData, "date");
             String time = extractStringValue(requestData, "time");
             
+            // Combiner date et time pour créer reservationTime
+            String reservationTime = date + " " + time;
+            
             System.out.println("[ReservationHandler] Données extraites : restaurantId=" + restaurantId + 
                              ", tableId=" + tableId + 
                              ", partySize=" + partySize + 
                              ", firstName=" + firstName + 
                              ", lastName=" + lastName + 
                              ", phone=" + phone + 
-                             ", date=" + date + 
-                             ", time=" + time);
+                             ", reservationTime=" + reservationTime);
             
             // Appeler le service de réservation
-            String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, partySize, date, time);
+            String response = this.serviceDb.reserve(restaurantId, tableId, firstName, lastName, phone, partySize, reservationTime);
             System.out.println("[ReservationHandler] Réponse du serviceDb : " + response);
             
             // Vérifier si la réservation a réussi
