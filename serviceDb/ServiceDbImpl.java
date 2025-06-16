@@ -111,9 +111,9 @@ public class ServiceDbImpl implements ServiceDb {
                     System.out.println("ok");
                 }
             }
-        } catch (ParseException e) {
-            result.put("status", "error");
-            result.put("message", "Format de date invalide. Utilisez le format YYYY-MM-DD HH:mm (ex: 2024-03-20 19:30)");
+        // } catch (ParseException e) {
+        //     result.put("status", "error");
+        //     result.put("message", "Format de date invalide. Utilisez le format YYYY-MM-DD HH:mm (ex: 2024-03-20 19:30)");
         } catch (SQLException e) {
             result.put("status", "error");
             result.put("message", e.getMessage());
