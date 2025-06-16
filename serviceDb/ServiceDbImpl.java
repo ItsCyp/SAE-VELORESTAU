@@ -74,22 +74,22 @@ public class ServiceDbImpl implements ServiceDb {
     }
 
     @Override
-    public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize, String reservationTime) throws RemoteException {
+    public String reserve(int restaurantId, int tableId, String firstName, String lastName, String phone, int partySize, String reservationDate) throws RemoteException {
         System.out.println("reserve");
-        System.out.println("Date reçue: " + reservationTime);
+        System.out.println("Date reçue: " + reservationDate);
         JSONObject result = new JSONObject();
         
         try {
             // Valider le format de la date
             System.out.println("Tentative de parsing de la date...");
-            Date parsedDate = dateFormat.parse(reservationTime);
+            Date parsedDate = dateFormat.parse(reservationDate);
             String formattedDateTime = dateFormat.format(parsedDate);
             System.out.println("Date parsée avec succès: " + formattedDateTime);
             
             try (Connection conn = dbManager.getConnection()) {
                 // Vérifier si la table est déjà réservée
                 try (PreparedStatement checkPs = conn.prepareStatement(
-                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_time = ?")) {
+                        "SELECT COUNT(*) FROM reservations WHERE restaurant_id = ? AND table_id = ? AND reservation_date = ?")) {
                     checkPs.setInt(1, restaurantId);
                     checkPs.setInt(2, tableId);
                     checkPs.setString(3, formattedDateTime);
@@ -104,7 +104,7 @@ public class ServiceDbImpl implements ServiceDb {
 
                 // Si la table est disponible, procéder à la réservation
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_time) VALUES(?,?,?,?,?,?,?)")) {
+                        "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_date) VALUES(?,?,?,?,?,?,?)")) {
                     ps.setInt(1, restaurantId);
                     ps.setInt(2, tableId);
                     ps.setString(3, firstName);
