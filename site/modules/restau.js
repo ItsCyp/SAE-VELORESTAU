@@ -3,6 +3,7 @@ import config from './config.js';
 import { createIcons, icons } from "lucide";
 
 let restauMarkers = L.layerGroup();
+let restaurants = []; // Variable globale pour stocker les restaurants
 
 async function fetchRestaurants(){
     const response = await fetch(config.API_RESTAU);
@@ -13,7 +14,7 @@ async function fetchRestaurants(){
 
 async function createMarker(map){
     // Récupérer les données des restaurants depuis l'API
-    const restaurants = await fetchRestaurants();
+    restaurants = await fetchRestaurants(); // Stocker les restaurants dans la variable globale
     
     // Créer un marqueur pour chaque restaurant
     restaurants.forEach(restaurant => {
@@ -52,23 +53,62 @@ async function createMarker(map){
     restauMarkers.addTo(map);
 }
 
+function showConfirmationModal(message, type = 'success') {
+    const modal = document.createElement('div');
+    modal.className = 'confirmation-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header ${type}">
+                <h3>${type === 'success' ? 'Succès' : 'Information'}</h3>
+            </div>
+            <div class="modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="ok-button">OK</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Gérer la fermeture de la modale
+    const closeModal = () => {
+        modal.remove();
+    };
+
+    // Fermer en cliquant sur le bouton OK
+    modal.querySelector('.ok-button').onclick = closeModal;
+
+    // Fermer en cliquant en dehors de la modale
+    modal.onclick = (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+}
+
 function showReservationModal(restaurantId) {
+    // Récupérer les données du restaurant sélectionné
+    const restaurant = restaurants.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+
     // Créer la fenêtre modale
     const modal = document.createElement('div');
     modal.className = 'reservation-modal';
     modal.innerHTML = `
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2>Réserver une table</h2>
-            <div class="tables-list">
-                <h3>Tables disponibles</h3>
-                <div class="tables-grid">
-                    ${generateTablesList()}
+            <h2>Réserver une table - ${restaurant.name}</h2>
+            <form id="reservation-form">
+                <div class="tables-list">
+                    <h3>Tables disponibles</h3>
+                    <div class="tables-grid">
+                        ${generateTablesList(restaurant.tables)}
+                    </div>
                 </div>
-            </div>
-            <div class="reservation-form">
-                <h3>Détails de la réservation</h3>
-                <form id="reservation-form">
+                <div class="reservation-form">
+                    <h3>Détails de la réservation</h3>
                     <div class="form-group">
                         <label for="date">Date:</label>
                         <input type="date" id="date" required>
@@ -79,11 +119,11 @@ function showReservationModal(restaurantId) {
                     </div>
                     <div class="form-group">
                         <label for="guests">Nombre de personnes:</label>
-                        <input type="number" id="guests" min="1" max="8" required>
+                        <input type="number" id="guests" min="1" value="1" required>
                     </div>
                     <button type="submit" class="submit-reservation">Confirmer la réservation</button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     `;
 
@@ -103,17 +143,43 @@ function showReservationModal(restaurantId) {
         }
     };
 
+    // Mettre à jour le nombre maximum de personnes en fonction de la table sélectionnée
+    const guestsInput = modal.querySelector('#guests');
+    const tableInputs = modal.querySelectorAll('input[name="table"]');
+    
+    tableInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            const selectedTable = restaurant.tables.find(t => t.id === parseInt(input.value));
+            if (selectedTable) {
+                guestsInput.max = selectedTable.seats;
+                // Si la valeur actuelle est supérieure au nouveau maximum, la réduire
+                if (parseInt(guestsInput.value) > selectedTable.seats) {
+                    guestsInput.value = selectedTable.seats;
+                }
+            }
+        });
+    });
+
     // Gérer la soumission du formulaire
     const form = modal.querySelector('#reservation-form');
     form.onsubmit = async (e) => {
         e.preventDefault();
         const date = form.querySelector('#date').value;
         const time = form.querySelector('#time').value;
-        const guests = form.querySelector('#guests').value;
-        const selectedTable = form.querySelector('input[name="table"]:checked')?.value;
+        const guests = parseInt(form.querySelector('#guests').value);
+        const selectedTableInput = form.querySelector('input[name="table"]:checked');
+        
+        if (!selectedTableInput) {
+            showConfirmationModal('Veuillez sélectionner une table', 'error');
+            return;
+        }
 
-        if (!selectedTable) {
-            alert('Veuillez sélectionner une table');
+        const selectedTable = selectedTableInput.value;
+
+        // Vérifier si le nombre de personnes correspond à la capacité de la table
+        const table = restaurant.tables.find(t => t.id === parseInt(selectedTable));
+        if (guests > table.seats) {
+            showConfirmationModal(`Cette table ne peut accueillir que ${table.seats} personnes maximum`, 'error');
             return;
         }
 
@@ -121,15 +187,17 @@ function showReservationModal(restaurantId) {
             // Créer l'objet de réservation
             const reservationData = {
                 restaurantId: restaurantId,
-                tableId: selectedTable,
+                tableId: parseInt(selectedTable),
                 date: date,
                 time: time,
-                guests: parseInt(guests),
-                timestamp: new Date().toISOString() // Pour la gestion des conflits
+                guests: guests,
+                timestamp: new Date().toISOString()
             };
 
+            console.log(reservationData);
+
             // Envoyer la réservation au serveur
-            const response = await fetch(`${config.API_RESTAU}/reservations`, {
+            const response = await fetch(`${config.API_RESERVATION}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -140,37 +208,35 @@ function showReservationModal(restaurantId) {
             if (!response.ok) {
                 const error = await response.json();
                 if (error.code === 'CONFLICT') {
-                    alert('Cette table a déjà été réservée. Veuillez en sélectionner une autre.');
+                    showConfirmationModal('Cette table a déjà été réservée. Veuillez en sélectionner une autre.', 'error');
                     return;
                 }
                 throw new Error('Erreur lors de la réservation');
             }
 
             const result = await response.json();
-            alert(`Réservation confirmée pour le ${date} à ${time} pour ${guests} personnes`);
+            showConfirmationModal(`Réservation confirmée pour le ${date} à ${time} pour ${guests} personnes`);
             modal.remove();
         } catch (error) {
             console.error('Erreur:', error);
-            alert('Une erreur est survenue lors de la réservation. Veuillez réessayer.');
+            showConfirmationModal('Une erreur est survenue lors de la réservation. Veuillez réessayer.', 'error');
         }
     };
 }
 
-function generateTablesList() {
-    // Générer une liste de 10 tables avec différentes capacités
+function generateTablesList(tables) {
     let tablesHtml = '';
-    for (let i = 1; i <= 10; i++) {
-        const capacity = Math.floor(Math.random() * 4) + 2; // Capacité entre 2 et 6 personnes
+    tables.forEach(table => {
         tablesHtml += `
             <div class="table-item">
-                <input type="radio" name="table" id="table-${i}" value="${i}">
-                <label for="table-${i}">
-                    Table ${i}
-                    <span class="capacity">(${capacity} personnes)</span>
+                <input type="radio" name="table" id="table-${table.id}" value="${table.id}">
+                <label for="table-${table.id}">
+                    Table ${table.table_number}
+                    <span class="capacity">(${table.seats} personnes)</span>
                 </label>
             </div>
         `;
-    }
+    });
     return tablesHtml;
 }
 

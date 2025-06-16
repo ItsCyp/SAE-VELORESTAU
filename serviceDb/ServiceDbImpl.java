@@ -17,28 +17,51 @@ public class ServiceDbImpl implements ServiceDb {
 
     @Override
     public String getRestaurants() throws RemoteException {
-        System.out.println("getRestaurants called");
         JSONArray array = new JSONArray();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM restaurants")) {
+                     "SELECT r.*, rt.id as table_id, rt.table_number, rt.seats " +
+                     "FROM restaurants r " +
+                     "LEFT JOIN restaurant_tables rt ON r.id = rt.restaurant_id " +
+                     "ORDER BY r.id, rt.table_number")) {
             ResultSet rs = ps.executeQuery();
-            System.out.println(ps.toString());
+            int currentRestaurantId = -1;
+            JSONObject currentRestaurant = null;
+            JSONArray tables = null;
+
             while (rs.next()) {
-                JSONObject o = new JSONObject();
-                o.put("id", rs.getInt("id")); 
-                System.out.println("Processing restaurant ID: " + rs.getInt("id"));
-                o.put("name", rs.getString("name"));
-                System.out.println("Processing restaurant name: " + rs.getString("name"));
-                o.put("address", rs.getString("address"));
-                System.out.println("Processing restaurant address: " + rs.getString("address"));
-                o.put("latitude", rs.getDouble("latitude"));
-                System.out.println("Processing restaurant latitude: " + rs.getDouble("latitude"));
-                o.put("longitude", rs.getDouble("longitude"));
-                System.out.println("Processing restaurant longitude: " + rs.getDouble("longitude"));
-                o.put("phone", rs.getString("phone"));
-                System.out.println("Processing restaurant phone: " + rs.getString("phone"));
-                array.put(o);
+                int restaurantId = rs.getInt("id");
+                
+                if (restaurantId != currentRestaurantId) {
+                    if (currentRestaurant != null) {
+                        currentRestaurant.put("tables", tables);
+                        array.put(currentRestaurant);
+                    }
+                    
+                    currentRestaurantId = restaurantId;
+                    currentRestaurant = new JSONObject();
+                    tables = new JSONArray();
+                    
+                    currentRestaurant.put("id", restaurantId);
+                    currentRestaurant.put("name", rs.getString("name"));
+                    currentRestaurant.put("address", rs.getString("address"));
+                    currentRestaurant.put("latitude", rs.getDouble("latitude"));
+                    currentRestaurant.put("longitude", rs.getDouble("longitude"));
+                    currentRestaurant.put("phone", rs.getString("phone"));
+                }
+
+                if (rs.getInt("table_id") != 0) {
+                    JSONObject table = new JSONObject();
+                    table.put("id", rs.getInt("table_id"));
+                    table.put("table_number", rs.getInt("table_number"));
+                    table.put("seats", rs.getInt("seats"));
+                    tables.put(table);
+                }
+            }
+            
+            if (currentRestaurant != null) {
+                currentRestaurant.put("tables", tables);
+                array.put(currentRestaurant);
             }
         } catch (SQLException e) {
             throw new RemoteException("SQL error", e);
@@ -48,6 +71,7 @@ public class ServiceDbImpl implements ServiceDb {
 
     @Override
     public String reserve(int restaurantId, String firstName, String lastName, String phone, int partySize) throws RemoteException {
+        System.out.println("reserve");
         JSONObject result = new JSONObject();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(
@@ -59,10 +83,12 @@ public class ServiceDbImpl implements ServiceDb {
             ps.setInt(5, partySize);
             ps.executeUpdate();
             result.put("status", "ok");
+            System.out.println("ok");
         } catch (SQLException e) {
             result.put("status", "error");
             result.put("message", e.getMessage());
         }
+        System.out.println(result.toString());
         return result.toString();
     }
 }

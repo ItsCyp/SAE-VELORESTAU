@@ -93,6 +93,7 @@ public class ServeurHttpImpl implements ServeurHttp {
         if (this.servicesDb == null) {
             servicesDb = serv;
             server.createContext("/api/restaurants", new RestaurantHandler(serv));
+            server.createContext("/api/reservations", new ReservationHandler(serv));
         }
     }
 
