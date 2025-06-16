@@ -60,7 +60,8 @@ class ReservationHandler implements HttpHandler {
             String time = extractStringValue(requestData, "time");
             
             // Combiner date et time pour créer reservationTime
-            String reservationTime = date + " " + time;
+            String reservationTime = date + "T" + time;
+            System.out.println("[ReservationHandler] reservationTime=" + reservationTime);
             
             System.out.println("[ReservationHandler] Données extraites : restaurantId=" + restaurantId + 
                              ", tableId=" + tableId + 

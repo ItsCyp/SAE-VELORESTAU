@@ -82,6 +82,7 @@ public class ServiceDbImpl implements ServiceDb {
             // Valider le format de la date
             Date parsedDate = dateFormat.parse(reservationTime);
             String formattedDateTime = dateFormat.format(parsedDate);
+            System.out.println(formattedDateTime);
             
             try (Connection conn = dbManager.getConnection()) {
                 // Vérifier si la table est déjà réservée
