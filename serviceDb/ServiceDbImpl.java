@@ -92,7 +92,7 @@ public class ServiceDbImpl implements ServiceDb {
 
             // Si la table est disponible, procéder à la réservation
             try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_date, reservation_time) VALUES(?,?,?,?,?,?,?,?)")) {
+                    "INSERT INTO reservations(restaurant_id, table_id, first_name, last_name, phone, party_size, reservation_time) VALUES(?,?,?,?,?,?,?)")) {
                 ps.setInt(1, restaurantId);
                 ps.setInt(2, tableId);
                 ps.setString(3, firstName);
