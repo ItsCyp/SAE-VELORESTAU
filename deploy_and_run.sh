@@ -44,19 +44,32 @@ SERVER_PID=$!
 # Obtenir l'IP locale pour les autres services
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
-# Déployer sur les autres machines
-for host in $(grep -v '^#' "$HOSTS_FILE" | xargs); do
-    echo "Deploying to $host..."
-    # Utiliser sshpass pour éviter de redemander le mot de passe
-    echo "$USER_PASS" | sshpass -p "$USER_PASS" rsync -av --delete --exclude='.git' "$LOCAL_DIR/" "$host:$REMOTE_DIR/"
+# Lire les machines de la liste
+HOSTS=($(grep -v '^#' "$HOSTS_FILE" | xargs))
+
+echo "Machines trouvées dans $HOSTS_FILE : ${#HOSTS[@]}"
+
+# Fonction pour déployer serviceDb
+deploy_service_db() {
+    local target_host="$1"
+    local is_local="$2"
     
-    echo "Running remote setup on $host..."
-    # Créer un script temporaire pour la machine distante
-    cat > remote_script.sh << EOF
+    if [ "$is_local" = "true" ]; then
+        echo "Deploying serviceDb locally..."
+        cd "$LOCAL_DIR/serviceDb"
+        javac -cp ".:lib/*" *.java
+        nohup java -cp ".:lib/*" Main "$LOCAL_IP" conf.ini >/tmp/serviceDb.log 2>&1 &
+        cd - > /dev/null
+    else
+        echo "Deploying serviceDb to $target_host..."
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" rsync -av --delete --exclude='.git' "$LOCAL_DIR/" "$target_host:$REMOTE_DIR/"
+        
+        echo "Running serviceDb setup on $target_host..."
+        cat > remote_script_db.sh << EOF
 #!/bin/bash
 cd $REMOTE_DIR
 
-# Compiler et démarrer les services
+# Compiler et démarrer serviceDb
 if [ -d serviceDb ]; then
     echo "Compiling serviceDb..."
     cd serviceDb
@@ -64,7 +77,35 @@ if [ -d serviceDb ]; then
     nohup java -cp ".:lib/*" Main "$LOCAL_IP" conf.ini >/tmp/serviceDb.log 2>&1 &
     cd ..
 fi
+EOF
 
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" scp remote_script_db.sh "$target_host:$REMOTE_DIR/"
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" ssh "$target_host" "chmod +x $REMOTE_DIR/remote_script_db.sh && cd $REMOTE_DIR && ./remote_script_db.sh"
+        rm remote_script_db.sh
+    fi
+}
+
+# Fonction pour déployer serviceHttp
+deploy_service_http() {
+    local target_host="$1"
+    local is_local="$2"
+    
+    if [ "$is_local" = "true" ]; then
+        echo "Deploying serviceHttp locally..."
+        cd "$LOCAL_DIR/serviceHttp"
+        javac *.java
+        nohup java Main "$LOCAL_IP" conf.ini >/tmp/serviceHttp.log 2>&1 &
+        cd - > /dev/null
+    else
+        echo "Deploying serviceHttp to $target_host..."
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" rsync -av --delete --exclude='.git' "$LOCAL_DIR/" "$target_host:$REMOTE_DIR/"
+        
+        echo "Running serviceHttp setup on $target_host..."
+        cat > remote_script_http.sh << EOF
+#!/bin/bash
+cd $REMOTE_DIR
+
+# Compiler et démarrer serviceHttp
 if [ -d serviceHttp ]; then
     echo "Compiling serviceHttp..."
     cd serviceHttp
@@ -74,11 +115,28 @@ if [ -d serviceHttp ]; then
 fi
 EOF
 
-    # Copier et exécuter le script sur la machine distante
-    echo "$USER_PASS" | sshpass -p "$USER_PASS" scp remote_script.sh "$host:$REMOTE_DIR/"
-    echo "$USER_PASS" | sshpass -p "$USER_PASS" ssh "$host" "chmod +x $REMOTE_DIR/remote_script.sh && cd $REMOTE_DIR && ./remote_script.sh"
-    rm remote_script.sh
-done
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" scp remote_script_http.sh "$target_host:$REMOTE_DIR/"
+        echo "$USER_PASS" | sshpass -p "$USER_PASS" ssh "$target_host" "chmod +x $REMOTE_DIR/remote_script_http.sh && cd $REMOTE_DIR && ./remote_script_http.sh"
+        rm remote_script_http.sh
+    fi
+}
+
+# Gestion des différents cas
+if [ ${#HOSTS[@]} -eq 0 ]; then
+    echo "Aucune machine dans la liste. Déploiement local des deux services."
+    deploy_service_db "" "true"
+    deploy_service_http "" "true"
+elif [ ${#HOSTS[@]} -eq 1 ]; then
+    echo "Une seule machine trouvée. Déploiement des deux services sur $HOSTS[0]"
+    deploy_service_db "${HOSTS[0]}" "false"
+    deploy_service_http "${HOSTS[0]}" "false"
+else
+    echo "Deux machines ou plus trouvées. Déploiement séparé :"
+    echo "- serviceDb sur ${HOSTS[0]}"
+    echo "- serviceHttp sur ${HOSTS[1]}"
+    deploy_service_db "${HOSTS[0]}" "false"
+    deploy_service_http "${HOSTS[1]}" "false"
+fi
 
 echo "Déploiement terminé. Les services sont en cours d'exécution."
 echo "Pour arrêter tous les services, exécutez : kill $RMI_PID $SERVER_PID"
