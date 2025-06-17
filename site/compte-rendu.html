@@ -26,7 +26,7 @@
                 <article class="section">
                     <h2><i data-lucide="info"></i> Présentation du Projet</h2>
                     <p>VELORESTAU est une application web permettant de visualiser les stations de vélos et les restaurants à Nancy. Cette application a été développée dans le cadre d'une SAE de 2ème année de BUT Informatique.</p>
-                    <h2><i data-lucide="users"></i>Equipe</h2>
+                    <h2><i data-lucide="users"></i>Notre équipe</h2>
                     <ul>
                         <li>DUHOUX Olivier</li>
                         <li>MATHIEU Gabin</li>
@@ -40,8 +40,8 @@
                     <h3>Technologies Employées</h3>
                     <ul>
                         <li><strong>Frontend :</strong> HTML, CSS, JavaScript</li>
-                        <li><strong>Librairies :</strong> Lucide Icons, Leaflet.js</li>
                         <li><strong>Backend :</strong> Java</li>
+                        <li><strong>Librairies :</strong> Lucide Icons, Leaflet.js</li>
                         <li><strong>Services :</strong> RMI, HttpServer (Proxy) et serviceDb (RMI)</li>
                         <li><strong>Base de données :</strong> Oracle (Charlemagne)</li>
                         <li><strong>Hébergement :</strong> Webetu</li>
@@ -62,35 +62,37 @@
                     <h2><i data-lucide="check-circle"></i> Réalisations</h2>
                     <h3>Services Implémentés</h3>
                     <ul>
-                        <li>Service RMI pour la gestion des restaurants
+                        <li>Service base de données (RMI)
                             <ul>
-                                <li>Inscription au service central</li>
-                                <li>Récupération des coordonnées des restaurants</li>
-                                <li>Système de réservation de tables</li>
+                                <li>Inscription au serveur central via RMI</li>
+                                <li>Récupération des informations des restaurants depuis la base de données Oracle</li>
+                                <li>Envoi des données au serveur central via RMI</li>
                             </ul>
                         </li>
-                        <li>Service de données ouvertes
+                        <li>Service Proxy (HttpServer)
                             <ul>
-                                <li>Récupération des données des stations vélibs</li>
-                                <li>Affichage des disponibilités en temps réel</li>
+                                <li>Récupération des données des stations vélibs via les données ouvertes</li>
+                                <li>Récupération des incidents de circulation</li>
+                                <li>Gestion des données bloquées par le proxy IUT</li>
+                                <li>Envoi des données au serveur central via RMI</li>
                             </ul>
                         </li>
-                        <li>Proxy HttpServer
+                        <li>Serveur central (RMI + HTTP)
                             <ul>
-                                <li>Gestion des données bloquées</li>
-                                <li>Accès aux incidents de circulation</li>
-                                <li>Intégration avec le service RMI</li>
+                                <li>Réception des données des services via RMI</li>
+                                <li>Exposition d'API REST (/api/restaurants, /api/velibs, etc.)</li>
+                                <li>Gestion centralisée des données</li>
+                                <li>Interface web pour la visualisation</li>
                             </ul>
                         </li>
                     </ul>
 
                     <h3>Aspects Techniques</h3>
                     <ul>
-                        <li>Gestion des dépendances avec Maven</li>
-                        <li>Compilation automatique</li>
+                        <li>Compilation automatique du projet</li>
                         <li>Documentation Javadoc de l'API publique</li>
                         <li>Gestion des erreurs réseau et des timeouts</li>
-                        <li>Configuration du proxy IUT</li>
+                        <li>Configuration du proxy IUT pour l'accès aux données externes</li>
                     </ul>
                 </article>
 
@@ -99,30 +101,21 @@
                     <h3>Prérequis</h3>
                     <ul>
                         <li>Java 8 ou supérieur</li>
-                        <li>Maven</li>
                         <li>Oracle Database (sur Charlemagne)</li>
                         <li>Un navigateur web moderne</li>
                     </ul>
 
-                    <h3>Installation et Déploiement</h3>
-                    <div class="code-block">
-                        # Cloner le repository<br>
-                        git clone https://github.com/ItsCyp/SAE-VELORESTAU.git<br>
-                        cd SAE-VELORESTAU<br><br>
-                        # Compiler le projet<br>
-                        mvn clean install<br><br>
-                        # Déployer sur webetu<br>
-                        # Le site web doit être placé dans le répertoire www de webetu<br><br>
-                        # Lancer les services<br>
-                        # Les services doivent être lancés sur différentes machines de la salle
-                    </div>
-
                     <h3>Configuration</h3>
                     <ul>
-                        <li>Configuration du proxy IUT pour l'accès externe</li>
-                        <li>Paramètres de connexion à la base de données Oracle</li>
-                        <li>Configuration des services RMI</li>
+                        <li>Configuration du proxy IUT pour l'accès externe (conf.ini)</li>
+                        <li>Paramètres de connexion à la base de données Oracle (conf.ini)</li>
+                        <li>Configuration des services RMI (conf.ini)</li>
                     </ul>
+
+                    <h3>Hébergement</h3>
+                    <p>Le site web est hébergé sur Webetu, un serveur de l'IUT.</p>
+                    <p>Les services sont lancés sur différentes machines de la salle.</p>
+                    <p>Le site web est accessible à l'adresse : <a href="https://webetu.iutnc.univ-lorraine.fr/www/e0617u/SAE_VELORESTAU/" target="_blank">https://webetu.iutnc.univ-lorraine.fr/www/e0617u/SAE_VELORESTAU/</a></p>
                 </article>
 
                 <article class="section">
@@ -136,22 +129,19 @@
                 <article class="section">
                     <h2><i data-lucide="alert-triangle"></i> Difficultés Rencontrées</h2>
                     <ul>
-                        <li>Gestion des différences de versions Java entre les machines</li>
                         <li>Configuration du proxy pour l'accès aux données externes</li>
-                        <li>Gestion des timeouts et des erreurs réseau</li>
                         <li>Déploiement sur les différentes machines de la salle</li>
                         <li>Compatibilité avec Oracle sur Charlemagne</li>
+                        <li>Problèmes de configuration et de connexion à la base de données Oracle</li>
+                        <li>Difficultés avec la réservation de tables dans les restaurants</li>
                     </ul>
                 </article>
 
                 <article class="section">
                     <h2><i data-lucide="lightbulb"></i> Améliorations Futures</h2>
                     <ul>
-                        <li>Migration vers MariaDB pour une meilleure compatibilité</li>
-                        <li>Optimisation des performances des services RMI</li>
-                        <li>Amélioration de la gestion des erreurs réseau</li>
-                        <li>Ajout de tests automatisés</li>
-                        <li>Mise en place d'un système de monitoring des services</li>
+                        <li>Pouvoir voir la liste des tables réservées pour les clients</li>
+                        <li>Pouvoir enlever la table réservée pendant une certaine période</li>
                     </ul>
                 </article>
             </section>
