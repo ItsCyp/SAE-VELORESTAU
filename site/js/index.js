@@ -9621,7 +9621,7 @@
     "config/config.json"(exports, module) {
       module.exports = {
         server: {
-          ip: "10.13.5.103",
+          ip: "100.64.80.78",
           port: "8008"
         },
         weather: {

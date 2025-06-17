@@ -2,18 +2,32 @@
 
 set -e
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <hosts-file> <local-project-dir> <remote-dir>"
-    # Exemple : bash deploy_and_run.sh hosts.txt SAE-VELORESTAU/ service/
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    echo "Usage: $0 [hosts-file] <local-project-dir> <remote-dir>"
+    echo "  hosts-file: fichier contenant les IPs des machines (défaut: hosts.txt)"
+    echo "  local-project-dir: répertoire du projet local"
+    echo "  remote-dir: répertoire de destination sur les machines distantes"
+    echo ""
+    echo "Exemples :"
+    echo "  bash deploy_and_run.sh hosts.txt . service/"
+    echo "  bash deploy_and_run.sh . service/  # utilise hosts.txt par défaut"
     exit 1
 fi
 
-HOSTS_FILE="$1"
-LOCAL_DIR="$2"
-REMOTE_DIR="$3"
+# Si 2 arguments : utiliser hosts.txt par défaut
+if [ "$#" -eq 2 ]; then
+    HOSTS_FILE="hosts.txt"
+    LOCAL_DIR="$1"
+    REMOTE_DIR="$2"
+else
+    HOSTS_FILE="$1"
+    LOCAL_DIR="$2"
+    REMOTE_DIR="$3"
+fi
 
 if [ ! -f "$HOSTS_FILE" ]; then
     echo "Hosts file '$HOSTS_FILE' not found"
+    echo "Vérifiez que le fichier existe dans le répertoire courant ou spécifiez le bon chemin"
     exit 1
 fi
 
@@ -56,7 +70,7 @@ deploy_service_db() {
     
     if [ "$is_local" = "true" ]; then
         echo "Deploying serviceDb locally..."
-        cd "$LOCAL_DIR/serviceDb"
+        cd "serviceDb"
         javac -cp ".:lib/*" *.java
         nohup java -cp ".:lib/*" Main "$LOCAL_IP" conf.ini >/tmp/serviceDb.log 2>&1 &
         cd - > /dev/null
@@ -92,7 +106,7 @@ deploy_service_http() {
     
     if [ "$is_local" = "true" ]; then
         echo "Deploying serviceHttp locally..."
-        cd "$LOCAL_DIR/serviceHttp"
+        cd "serviceHttp"
         javac *.java
         nohup java Main "$LOCAL_IP" conf.ini >/tmp/serviceHttp.log 2>&1 &
         cd - > /dev/null
