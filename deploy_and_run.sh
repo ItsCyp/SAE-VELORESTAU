@@ -55,6 +55,8 @@ sleep 2
 java Main conf.ini >/tmp/serveurCentral.log 2>&1 &
 SERVER_PID=$!
 
+cd "$LOCAL_DIR"
+
 # Obtenir l'IP locale pour les autres services
 LOCAL_IP=$(hostname -I | awk '{print $1}')
 
@@ -141,7 +143,7 @@ if [ ${#HOSTS[@]} -eq 0 ]; then
     deploy_service_db "" "true"
     deploy_service_http "" "true"
 elif [ ${#HOSTS[@]} -eq 1 ]; then
-    echo "Une seule machine trouvée. Déploiement des deux services sur $HOSTS[0]"
+    echo "Une seule machine trouvée. Déploiement des deux services sur ${HOSTS[0]}"
     deploy_service_db "${HOSTS[0]}" "false"
     deploy_service_http "${HOSTS[0]}" "false"
 else
